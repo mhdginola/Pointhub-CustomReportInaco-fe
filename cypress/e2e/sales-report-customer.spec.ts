@@ -1,7 +1,7 @@
 describe('sales report customer',() => {
   describe('user not login', () => {
     beforeEach(() => {
-      cy.visit('/sales-report-customer')
+      cy.visit('/sales/customer-report')
     })
     it('redirect to login page', () => {
       cy.location('pathname').should('eq', '/login')
@@ -12,7 +12,7 @@ describe('sales report customer',() => {
       cy.visit('/login')
       cy.get('button.login-google').click()
       cy.visit('/')
-      cy.visit('/sales-report-customer')
+      cy.visit('/sales/customer-report')
     })
 
     it('show page sales report customer', () => {

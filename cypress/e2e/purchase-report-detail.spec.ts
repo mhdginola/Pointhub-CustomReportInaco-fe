@@ -1,7 +1,7 @@
 describe('purchase report detail',() => {
   describe('user not login', () => {
     beforeEach(() => {
-      cy.visit('/purchase-report-detail')
+      cy.visit('/purchase/report-detail')
     })
     it('redirect to login page', () => {
       cy.location('pathname').should('eq', '/login')
@@ -12,7 +12,7 @@ describe('purchase report detail',() => {
       cy.visit('/login')
       cy.get('button.login-google').click()
       cy.visit('/')
-      cy.visit('/purchase-report-detail')
+      cy.visit('/purchase/report-detail')
     })
 
     it('show page purchase report detail', () => {

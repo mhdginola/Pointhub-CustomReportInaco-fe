@@ -126,6 +126,54 @@ const menuMain = {
           path: '/nested/page-nested-2'
         }
       ]
+    },
+    {
+      name: 'Purchase',
+      submenu: [
+        {
+          name: 'Purchase Report',
+          path: '/purchase/report'
+        },
+        {
+          name: 'Purchase Report Details',
+          path: '/purchase/report-details'
+        }
+      ]
+    },
+    {
+      name: 'Sales',
+      submenu: [
+        {
+          name: 'Sales Report',
+          path: '/sales/report'
+        },
+        {
+          name: 'Sales Customer Report',
+          path: '/sales/customer-report'
+        }
+      ]
+    },
+    {
+      name: 'Financing',
+      submenu: [
+        {
+          name: 'Debts Aging Report',
+          path: '/finance/debts-aging-report'
+        },
+        {
+          name: 'Debts Aging Report per Customer',
+          path: '/finance/debts-aging-customer-report'
+        }
+      ]
+    },
+    {
+      name: 'Inventory',
+      submenu: [
+        {
+          name: 'Inventory Report',
+          path: '/inventory/report'
+        },
+      ]
     }
   ]
 }
