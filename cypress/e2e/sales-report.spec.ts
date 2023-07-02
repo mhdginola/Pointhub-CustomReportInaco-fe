@@ -1,7 +1,7 @@
 describe('sales report',() => {
   describe('user not login', () => {
     beforeEach(() => {
-      cy.visit('/sales-report')
+      cy.visit('/sales/sales-report')
     })
     it('redirect to login page', () => {
       cy.location('pathname').should('eq', '/login')
@@ -27,14 +27,14 @@ describe('sales report',() => {
           }
         })
       }).as('login')
-      cy.visit('/template')
+      
       cy.get('input[name="email"]').type('admin')
       cy.get('input[name="password"]').type('admin123')
       cy.get('button#login').click()
       
       cy.wait('@login')
       cy.location('pathname').should('eq', '/')
-      cy.visit('/sales-report')
+      cy.visit('/sales/sales-report')
     })
 
     it('show page sales report', () => {
