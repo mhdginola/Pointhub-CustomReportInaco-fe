@@ -10,12 +10,51 @@ describe('debts aging per customer report',() => {
   describe('user login', () => {
     beforeEach(() => {
       cy.visit('/login')
-      cy.get('button.login-google').click()
-      cy.visit('/')
+      cy.intercept('POST', `${Cypress.env('BASE_API_URL')}/auth/signin`, (req) => {
+        const requestBody = JSON.parse(req.body);
+  
+        expect(requestBody).to.deep.equal({
+          email: 'admin',
+          password: 'admin123',
+        });
+        
+        req.headers['authorization'] = 'Basic YWxhZGRpbjpvcGVuc2VzYW1l'
+  
+        req.reply({
+          status: 200,
+          body: {
+            accessToken: 'string12345'
+          }
+        })
+      }).as('login')
+      cy.visit('/template')
+      cy.get('input[name="email"]').type('admin')
+      cy.get('input[name="password"]').type('admin123')
+      cy.get('button#login').click()
+      
+      cy.wait('@login')
+      cy.location('pathname').should('eq', '/')
       cy.visit('/debts-aging-customer-report')
     })
 
     it('show page debts aging per customer report', () => {
+      const body = {
+        debtsAgingReportPerCustomers: [
+          { id: 1, customerID: 'wr1', name:'NB001', invoice: 'in1', invoiceDate: '2023-01-01', description:'PO-001', dpp: 'supplier1', ppn: '2023-01-01', totalInvoice: 'NSJ-001', payment: 'nacme1', debitMemo: '1000', cn: 'nacme1', remaining: '1000' },
+          { id: 2, customerID: 'wr2', name:'NB002', invoice: 'in2', invoiceDate: '2022-01-01', description:'PO-002', dpp: 'supplier2', ppn: '2022-01-01', totalInvoice: 'NSJ-002', payment: 'nacme2', debitMemo: '2000', cn: 'nacme2', remaining: '2000' },
+          { id: 3, customerID: 'wr3', name:'NB003', invoice: 'in3', invoiceDate: '2022-06-01', description:'PO-003', dpp: 'supplier3', ppn: '2022-06-01', totalInvoice: 'NSJ-003', payment: 'nacme3', debitMemo: '3000', cn: 'nacme3', remaining: '3000' },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/debtsAgingReportPerCustomers`, {
+        status: 200,
+        body: body
+      }).as('getData')
       cy.contains('th','Cust ID')
       cy.contains('th','Name')
       cy.contains('th','Invoice')
@@ -28,45 +67,175 @@ describe('debts aging per customer report',() => {
       cy.contains('th','Debit Memo')
       cy.contains('th','CN')
       cy.contains('th','Remaining')
+      
+      cy.wait('@getData')
+      cy.get('td.no').each(($td, index)=>{
+        expect($td.text()).to.equal(index)
+      })
+      cy.get('td.customerID').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].customerID)
+      })
+      cy.get('td.name').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].name)
+      })
+      cy.get('td.invoice').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].invoice)
+      })
+      cy.get('td.invoiceDate').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].invoiceDate)
+      })
+      cy.get('td.description').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].description)
+      })
+      cy.get('td.dpp').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].dpp)
+      })
+      cy.get('td.ppn').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].ppn)
+      })
+      cy.get('td.totalInvoice').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].totalInvoice)
+      })
+      cy.get('td.payment').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].payment)
+      })
+      cy.get('td.debitMemo').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].debitMemo)
+      })
+      cy.get('td.cn').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].remaining)
+      })
+      cy.get('td.remaining').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].remaining)
+      })
     })
     it('show page debt aging customer report, with filter', () => {
       const dateInvoice = '2022-01-01'
       const customer = 'PT ABC'
-      cy.intercept('GET', `/api/v1/debtAgingReportCustomer?filter[date]=${dateInvoice}&filter[customer]=${customer}`, {
+      const body = {
+        debtsAgingReportPerCustomers: [
+          { id: 1, customerID: 'wr1', name: customer, invoice: 'in1', invoiceDate: '2023-01-01', description:'PO-001', dpp: 'supplier1', ppn: '2023-01-01', totalInvoice: 'NSJ-001', payment: 'nacme1', debitMemo: '1000', cn: 'nacme1', remaining: '1000' },
+          { id: 2, customerID: 'wr2', name: customer, invoice: 'in2', invoiceDate: '2022-01-01', description:'PO-002', dpp: 'supplier2', ppn: '2022-01-01', totalInvoice: 'NSJ-002', payment: 'nacme2', debitMemo: '2000', cn: 'nacme2', remaining: '2000' },
+          { id: 3, customerID: 'wr3', name: customer, invoice: 'in3', invoiceDate: '2022-06-01', description:'PO-003', dpp: 'supplier3', ppn: '2022-06-01', totalInvoice: 'NSJ-003', payment: 'nacme3', debitMemo: '3000', cn: 'nacme3', remaining: '3000' },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/debtsAgingReportPerCustomers?filter[date]=${dateInvoice}&filter[customer]=${customer}`, {
         status: 200,
-        body: [
-          { id: 1, dateInvoice: dateInvoice, customer: customer },
-          { id: 2, dateInvoice: dateInvoice, customer: customer },
-          { id: 2, dateInvoice: dateInvoice, customer: customer },
-        ]
+        body: body
       }).as('getData');
       cy.get('input[name="date"]').type(dateInvoice)
       cy.get('select[name="customer"]').select(customer)
       cy.get('button#filter').click()
+      
       cy.wait('@getData')
-      cy.get('td#dateInvoice').each(($td) => {
-        expect(new Date($td.text())).to.equal(new Date(dateInvoice));
+      cy.get('td.no').each(($td, index)=>{
+        expect($td.text()).to.equal(index)
       })
-      cy.get('td#dataCustomer').each(($td) => {
-        expect($td.text()).to.equal(customer);
+      cy.get('td.customerID').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].customerID)
+      })
+      cy.get('td.name').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].name)
+      })
+      cy.get('td.invoice').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].invoice)
+      })
+      cy.get('td.invoiceDate').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].invoiceDate)
+      })
+      cy.get('td.description').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].description)
+      })
+      cy.get('td.dpp').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].dpp)
+      })
+      cy.get('td.ppn').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].ppn)
+      })
+      cy.get('td.totalInvoice').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].totalInvoice)
+      })
+      cy.get('td.payment').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].payment)
+      })
+      cy.get('td.debitMemo').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].debitMemo)
+      })
+      cy.get('td.cn').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].remaining)
+      })
+      cy.get('td.remaining').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].remaining)
       })
     })
     it('show page debt aging customer report, with search', () => {
       const customerSearch = 'customer test';
-      cy.intercept('GET', `/api/v1/debtAgingReportCustomer?search=${customerSearch}`, {
+      const body = {
+        debtsAgingReportPerCustomers: [
+          { id: 1, customerID: 'wr1', name: customerSearch, invoice: 'in1', invoiceDate: '2023-01-01', description:'PO-001', dpp: 'supplier1', ppn: '2023-01-01', totalInvoice: 'NSJ-001', payment: 'nacme1', debitMemo: '1000', cn: 'nacme1', remaining: '1000' },
+          { id: 2, customerID: 'wr2', name: customerSearch, invoice: 'in2', invoiceDate: '2022-01-01', description:'PO-002', dpp: 'supplier2', ppn: '2022-01-01', totalInvoice: 'NSJ-002', payment: 'nacme2', debitMemo: '2000', cn: 'nacme2', remaining: '2000' },
+          { id: 3, customerID: 'wr3', name: customerSearch, invoice: 'in3', invoiceDate: '2022-06-01', description:'PO-003', dpp: 'supplier3', ppn: '2022-06-01', totalInvoice: 'NSJ-003', payment: 'nacme3', debitMemo: '3000', cn: 'nacme3', remaining: '3000' },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/debtsAgingReportPerCustomers?search=${customerSearch}`, {
         status: 200,
-        body: [
-          { id: 1, customer: customerSearch },
-          { id: 2, customer: customerSearch },
-        ]
+        body: body
       }).as('getData');
       
       cy.get('input[name="search"]').type(customerSearch)
       cy.get('button#search').click()
 
       cy.wait('@getData')
-      cy.get('td#dataCustomer').each(($td) => {
-        expect($td.text()).to.contain(customerSearch);
+      cy.get('td.no').each(($td, index)=>{
+        expect($td.text()).to.equal(index)
+      })
+      cy.get('td.customerID').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].customerID)
+      })
+      cy.get('td.name').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].name)
+      })
+      cy.get('td.invoice').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].invoice)
+      })
+      cy.get('td.invoiceDate').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].invoiceDate)
+      })
+      cy.get('td.description').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].description)
+      })
+      cy.get('td.dpp').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].dpp)
+      })
+      cy.get('td.ppn').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].ppn)
+      })
+      cy.get('td.totalInvoice').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].totalInvoice)
+      })
+      cy.get('td.payment').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].payment)
+      })
+      cy.get('td.debitMemo').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].debitMemo)
+      })
+      cy.get('td.cn').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].remaining)
+      })
+      cy.get('td.remaining').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].remaining)
       })
     })
     it('should navigate through pages correctly', () => {

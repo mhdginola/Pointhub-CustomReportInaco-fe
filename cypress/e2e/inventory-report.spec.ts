@@ -10,12 +10,51 @@ describe('inventory report',() => {
   describe('user login', () => {
     beforeEach(() => {
       cy.visit('/login')
-      cy.get('button.login-google').click()
-      cy.visit('/')
+      cy.intercept('POST', `${Cypress.env('BASE_API_URL')}/auth/signin`, (req) => {
+        const requestBody = JSON.parse(req.body);
+  
+        expect(requestBody).to.deep.equal({
+          email: 'admin',
+          password: 'admin123',
+        });
+        
+        req.headers['authorization'] = 'Basic YWxhZGRpbjpvcGVuc2VzYW1l'
+  
+        req.reply({
+          status: 200,
+          body: {
+            accessToken: 'string12345'
+          }
+        })
+      }).as('login')
+      cy.visit('/template')
+      cy.get('input[name="email"]').type('admin')
+      cy.get('input[name="password"]').type('admin123')
+      cy.get('button#login').click()
+      
+      cy.wait('@login')
+      cy.location('pathname').should('eq', '/')
       cy.visit('/inventory-report')
     })
 
     it('show page inventory report', () => {
+      const body = {
+        inventoryReports: [
+          { id: 1, warehouse: 'wr1', item:'NB001', description: '2023-01-01', quantityInStock:'PO-001', issuesQuantity: 'supplier1', unitCost: '2023-01-01', startBalanceCost: 'NSJ-001', receiptsAmount: 'nacme1', issuesAmount: '1000' },
+          { id: 2, warehouse: 'wr2', item:'NB002', description: '2022-01-01', quantityInStock:'PO-002', issuesQuantity: 'supplier2', unitCost: '2022-01-01', startBalanceCost: 'NSJ-002', receiptsAmount: 'nacme2', issuesAmount: '2000' },
+          { id: 3, warehouse: 'wr3', item:'NB003', description: '2022-06-01', quantityInStock:'PO-003', issuesQuantity: 'supplier3', unitCost: '2022-06-01', startBalanceCost: 'NSJ-003', receiptsAmount: 'nacme3', issuesAmount: '3000' },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/inventoryReports`, {
+        status: 200,
+        body: body
+      }).as('getData')
       cy.contains('th','No.')
       cy.contains('th','Warehouse')
       cy.contains('th','Item')
@@ -27,53 +66,152 @@ describe('inventory report',() => {
       cy.contains('th','Start Balance Cost')
       cy.contains('th','Receipts Amount')
       cy.contains('th','Issues Amount')
+      
+      cy.wait('@getData')
+      cy.get('td.no').each(($td, index)=>{
+        expect($td.text()).to.equal(index)
+      })
+      cy.get('td.warehouse').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].warehouse)
+      })
+      cy.get('td.item').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].item)
+      })
+      cy.get('td.description').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].description)
+      })
+      cy.get('td.quantityInStock').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].quantityInStock)
+      })
+      cy.get('td.issuesQuantity').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].issuesQuantity)
+      })
+      cy.get('td.unitCost').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].unitCost)
+      })
+      cy.get('td.startBalanceCost').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].startBalanceCost)
+      })
+      cy.get('td.receiptsAmount').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].receiptsAmount)
+      })
+      cy.get('td.issuesAmount').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].issuesAmount)
+      })
     })
     it('show page inventory report, with filter', () => {
       const dateFrom = '2022-01-01'
       const dateTo = '2023-01-01'
       const item = 'item test'
       const warehouse = 'warehouse test'
-      cy.intercept('GET', `/api/v1/inventoryReport?filter[dateFrom]=${dateFrom}&filter[dateTo]=${dateTo}&filter[item]=${item}&filter[warehouse]=${warehouse}`, {
+      const body = {
+        inventoryReports: [
+          { id: 1, warehouse: warehouse, item: item, description: '2023-01-01', quantityInStock:'PO-001', issuesQuantity: 'supplier1', unitCost: '2023-01-01', startBalanceCost: 'NSJ-001', receiptsAmount: 'nacme1', issuesAmount: '1000' },
+          { id: 2, warehouse: warehouse, item: item, description: '2022-01-01', quantityInStock:'PO-002', issuesQuantity: 'supplier2', unitCost: '2022-01-01', startBalanceCost: 'NSJ-002', receiptsAmount: 'nacme2', issuesAmount: '2000' },
+          { id: 3, warehouse: warehouse, item: item, description: '2022-06-01', quantityInStock:'PO-003', issuesQuantity: 'supplier3', unitCost: '2022-06-01', startBalanceCost: 'NSJ-003', receiptsAmount: 'nacme3', issuesAmount: '3000' },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/inventoryReports?filter[dateFrom]=${dateFrom}&filter[dateTo]=${dateTo}&filter[item]=${item}&filter[warehouse]=${warehouse}`, {
         status: 200,
-        body: [
-          { id: 1, dateInvoice: '2023-01-01', item: item, warehouse: warehouse },
-          { id: 2, dateInvoice: '2022-01-01', item: item, warehouse: warehouse },
-          { id: 2, dateInvoice: '2022-06-01', item: item, warehouse: warehouse },
-        ]
+        body: body
       }).as('getData');
       cy.get('input[name="dateFrom"]').type(dateFrom)
       cy.get('input[name="dateTo"]').type(dateTo)
       cy.get('select[name="item"]').select(item)
       cy.get('select[name="warehouse"]').select(warehouse)
       cy.get('button#filter').click()
+      
       cy.wait('@getData')
-      cy.get('td#dateInvoice').each(($td) => {
-        expect(new Date($td.text())).to.be.gte(new Date(dateFrom));
-        expect(new Date($td.text())).to.be.lte(new Date(dateTo));
+      cy.get('td.no').each(($td, index)=>{
+        expect($td.text()).to.equal(index)
       })
-      cy.get('td#dataItem').each(($td) => {
-        expect($td.text()).to.equal(item);
+      cy.get('td.warehouse').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].warehouse)
       })
-      cy.get('td#dataWarehouse').each(($td) => {
-        expect($td.text()).to.equal(warehouse);
+      cy.get('td.item').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].item)
+      })
+      cy.get('td.description').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].description)
+      })
+      cy.get('td.quantityInStock').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].quantityInStock)
+      })
+      cy.get('td.issuesQuantity').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].issuesQuantity)
+      })
+      cy.get('td.unitCost').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].unitCost)
+      })
+      cy.get('td.startBalanceCost').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].startBalanceCost)
+      })
+      cy.get('td.receiptsAmount').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].receiptsAmount)
+      })
+      cy.get('td.issuesAmount').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].issuesAmount)
       })
     })
     it('show page inventory report, with search', () => {
       const itemSearch = 'item test';
-      cy.intercept('GET', `/api/v1/inventoryReport?search=${itemSearch}`, {
+      const body = {
+        inventoryReports: [
+          { id: 1, warehouse: 'wr1', item: itemSearch, description: '2023-01-01', quantityInStock:'PO-001', issuesQuantity: 'supplier1', unitCost: '2023-01-01', startBalanceCost: 'NSJ-001', receiptsAmount: 'nacme1', issuesAmount: '1000' },
+          { id: 2, warehouse: 'wr2', item: itemSearch, description: '2022-01-01', quantityInStock:'PO-002', issuesQuantity: 'supplier2', unitCost: '2022-01-01', startBalanceCost: 'NSJ-002', receiptsAmount: 'nacme2', issuesAmount: '2000' },
+          { id: 3, warehouse: 'wr3', item: itemSearch, description: '2022-06-01', quantityInStock:'PO-003', issuesQuantity: 'supplier3', unitCost: '2022-06-01', startBalanceCost: 'NSJ-003', receiptsAmount: 'nacme3', issuesAmount: '3000' },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/inventoryReports?search=${itemSearch}`, {
         status: 200,
-        body: [
-          { id: 1, item: itemSearch },
-          { id: 2, item: itemSearch },
-        ]
+        body: body
       }).as('getData');
       
       cy.get('input[name="search"]').type(itemSearch)
       cy.get('button#search').click()
 
       cy.wait('@getData')
-      cy.get('td#dataItem').each(($td) => {
-        expect($td.text()).to.contain(itemSearch);
+      cy.get('td.no').each(($td, index)=>{
+        expect($td.text()).to.equal(index)
+      })
+      cy.get('td.warehouse').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].warehouse)
+      })
+      cy.get('td.item').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].item)
+      })
+      cy.get('td.description').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].description)
+      })
+      cy.get('td.quantityInStock').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].quantityInStock)
+      })
+      cy.get('td.issuesQuantity').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].issuesQuantity)
+      })
+      cy.get('td.unitCost').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].unitCost)
+      })
+      cy.get('td.startBalanceCost').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].startBalanceCost)
+      })
+      cy.get('td.receiptsAmount').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].receiptsAmount)
+      })
+      cy.get('td.issuesAmount').each(($td, index)=>{
+        expect($td.text()).to.equal(body.inventoryReports[index].issuesAmount)
       })
     })
     it('should navigate through pages correctly', () => {

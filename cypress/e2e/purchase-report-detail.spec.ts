@@ -1,7 +1,7 @@
 describe('purchase report detail',() => {
   describe('user not login', () => {
     beforeEach(() => {
-      cy.visit('/purchase/report-detail')
+      cy.visit('/purchase-report-detail')
     })
     it('redirect to login page', () => {
       cy.location('pathname').should('eq', '/login')
@@ -10,12 +10,51 @@ describe('purchase report detail',() => {
   describe('user login', () => {
     beforeEach(() => {
       cy.visit('/login')
-      cy.get('button.login-google').click()
-      cy.visit('/')
-      cy.visit('/purchase/report-detail')
+      cy.intercept('POST', `${Cypress.env('BASE_API_URL')}/auth/signin`, (req) => {
+        const requestBody = JSON.parse(req.body);
+  
+        expect(requestBody).to.deep.equal({
+          email: 'admin',
+          password: 'admin123',
+        });
+        
+        req.headers['authorization'] = 'Basic YWxhZGRpbjpvcGVuc2VzYW1l'
+  
+        req.reply({
+          status: 200,
+          body: {
+            accessToken: 'string12345'
+          }
+        })
+      }).as('login')
+      cy.visit('/template')
+      cy.get('input[name="email"]').type('admin')
+      cy.get('input[name="password"]').type('admin123')
+      cy.get('button#login').click()
+      
+      cy.wait('@login')
+      cy.location('pathname').should('eq', '/')
+      cy.visit('/purchase-report-detail')
     })
 
     it('show page purchase report detail', () => {
+      const body = {
+        purchaseReportDetails: [
+          { id: 1, purchaseOrderNumber:'NB001', warehouse: '2023-01-01', vendorNumber:'PO-001', vendorName: 'supplier1', createDate: '2023-01-01', noInvoice: 'NSJ-001', item: 'NFP-001', itemDescription: '1000', qtyVoucher: '100', materialPrice: '9000', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
+          { id: 2, purchaseOrderNumber:'NB002', warehouse: '2022-01-01', vendorNumber:'PO-002', vendorName: 'supplier2', createDate: '2022-01-01', noInvoice: 'NSJ-002', item: 'NFP-002', itemDescription: '2000', qtyVoucher: '100', materialPrice: '1900', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
+          { id: 3, purchaseOrderNumber:'NB003', warehouse: '2022-06-01', vendorNumber:'PO-003', vendorName: 'supplier3', createDate: '2022-06-01', noInvoice: 'NSJ-003', item: 'NFP-003', itemDescription: '3000', qtyVoucher: '100', materialPrice: '2900', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReportDetails`, {
+        status: 200,
+        body: body
+      }).as('getData');
       cy.contains('th','No.')
       cy.contains('th','Warehouse')
       cy.contains('th','Purchase Order Num')
@@ -32,6 +71,55 @@ describe('purchase report detail',() => {
       cy.contains('th','After Discount')
       cy.contains('th','PPN')
       cy.contains('th','Total')
+      cy.wait('@getData')
+      cy.get('td.no').each(($td, index)=>{
+        expect($td.text()).to.equal(index)
+      })
+      cy.get('td.purchaseOrderNum').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].purchaseOrderNumber)
+      })
+      cy.get('td.Warehouse').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].warehouse)
+      })
+      cy.get('td.vendorNo').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].vendorNumber)
+      })
+      cy.get('td.vendorName').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].vendorName)
+      })
+      cy.get('td.noInvoice').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].noInvoice)
+      })
+      cy.get('td.createDate').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].createDate)
+      })
+      cy.get('td.item').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].item)
+      })
+      cy.get('td.itemDescription').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].itemDescription)
+      })
+      cy.get('td.qtyVoucher').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].qtyVoucher)
+      })
+      cy.get('td.materialPrice').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].materialPrice)
+      })
+      cy.get('td.materialPriceConv').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].materialPriceConversion)
+      })
+      cy.get('td.discount').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].discount)
+      })
+      cy.get('td.afterDiscount').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].afterDiscount)
+      })
+      cy.get('td.ppn').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].ppn)
+      })
+      cy.get('td.total').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].total)
+      })
     })
     it('show page purchase report detail, with filter', () => {
       const dateFrom = '2022-01-01'
@@ -39,13 +127,22 @@ describe('purchase report detail',() => {
       const supplier = 'PT ABC'
       const item = 'item test'
       const warehouse = 'warehouse test'
-      cy.intercept('GET', `/api/v1/purchaseReportDetail?filter[dateFrom]=${dateFrom}&filter[dateTo]=${dateTo}&filter[supplier]=${supplier}&filter[item]=${item}&filter[warehouse]=${warehouse}`, {
+      const body = {
+        purchaseReportDetails: [
+          { id: 1, purchaseOrderNumber:'NB001', warehouse: warehouse, vendorNumber:'PO-001', vendorName: supplier, createDate: 'NF-001', noInvoice: 'NSJ-001', item: item, itemDescription: '1000', qtyVoucher: '100', materialPrice: '9000', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
+          { id: 2, purchaseOrderNumber:'NB002', warehouse: warehouse, vendorNumber:'PO-002', vendorName: supplier, createDate: 'NF-002', noInvoice: 'NSJ-002', item: item, itemDescription: '2000', qtyVoucher: '100', materialPrice: '1900', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
+          { id: 3, purchaseOrderNumber:'NB003', warehouse: warehouse, vendorNumber:'PO-003', vendorName: supplier, createDate: 'NF-003', noInvoice: 'NSJ-003', item: item, itemDescription: '3000', qtyVoucher: '100', materialPrice: '2900', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReportDetails?filter[dateFrom]=${dateFrom}&filter[dateTo]=${dateTo}&filter[supplier]=${supplier}&filter[item]=${item}&filter[warehouse]=${warehouse}`, {
         status: 200,
-        body: [
-          { id: 1, dateInvoice: '2023-01-01', supplier: supplier, item: item, warehouse: warehouse },
-          { id: 2, dateInvoice: '2022-01-01', supplier: supplier, item: item, warehouse: warehouse },
-          { id: 2, dateInvoice: '2022-06-01', supplier: supplier, item: item, warehouse: warehouse },
-        ]
+        body: body
       }).as('getData');
       cy.get('input[name="dateFrom"]').type(dateFrom)
       cy.get('input[name="dateTo"]').type(dateTo)
@@ -54,35 +151,45 @@ describe('purchase report detail',() => {
       cy.get('select[name="warehouse"]').select(warehouse)
       cy.get('button#filter').click()
       cy.wait('@getData')
-      cy.get('td#dateInvoice').each(($td) => {
+      cy.get('td.createDate').each(($td) => {
         expect(new Date($td.text())).to.be.gte(new Date(dateFrom));
         expect(new Date($td.text())).to.be.lte(new Date(dateTo));
       })
-      cy.get('td#dataSupplier').each(($td) => {
+      cy.get('td.vendorName').each(($td) => {
         expect($td.text()).to.equal(supplier);
       })
-      cy.get('td#dataItem').each(($td) => {
+      cy.get('td.item').each(($td) => {
         expect($td.text()).to.equal(item);
       })
-      cy.get('td#dataWarehouse').each(($td) => {
+      cy.get('td.warehouse').each(($td) => {
         expect($td.text()).to.equal(warehouse);
       })
     })
     it('show page purchase report detail, with search', () => {
       const supplierSearch = 'supplier test';
-      cy.intercept('GET', `/api/v1/purchaseReportDetail?search=${supplierSearch}`, {
+      const body = {
+        purchaseReportDetails: [
+          { id: 1, purchaseOrderNumber:'NB001', warehouse: '2023-01-01', vendorNumber:'PO-001', vendorName: supplierSearch, createDate: '2023-01-01', noInvoice: 'NSJ-001', item: 'NFP-001', itemDescription: '1000', qtyVoucher: '100', materialPrice: '9000', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
+          { id: 2, purchaseOrderNumber:'NB002', warehouse: '2022-01-01', vendorNumber:'PO-002', vendorName: supplierSearch, createDate: '2022-01-01', noInvoice: 'NSJ-002', item: 'NFP-002', itemDescription: '2000', qtyVoucher: '100', materialPrice: '1900', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
+          { id: 3, purchaseOrderNumber:'NB003', warehouse: '2022-06-01', vendorNumber:'PO-003', vendorName: supplierSearch, createDate: '2022-06-01', noInvoice: 'NSJ-003', item: 'NFP-003', itemDescription: '3000', qtyVoucher: '100', materialPrice: '2900', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReportDetails?search[supplier]=${supplierSearch}`, {
         status: 200,
-        body: [
-          { id: 1, supplier: supplierSearch },
-          { id: 2, supplier: supplierSearch },
-        ]
+        body: body
       }).as('getData');
       
       cy.get('input[name="search"]').type(supplierSearch)
       cy.get('button#search').click()
 
       cy.wait('@getData')
-      cy.get('td#dataSupplier').each(($td) => {
+      cy.get('td#vendorName').each(($td) => {
         expect($td.text()).to.contain(supplierSearch);
       })
     })
@@ -114,6 +221,23 @@ describe('purchase report detail',() => {
       cy.contains('Downloading... please wait')
     })
     it('print purchase report detail', () => {
+      const body = {
+        purchaseReportDetails: [
+          { id: 1, purchaseOrderNumber:'NB001', warehouse: '2023-01-01', vendorNumber:'PO-001', vendorName: 'supplier1', createDate: '2023-01-01', noInvoice: 'NSJ-001', item: 'NFP-001', itemDescription: '1000', qtyVoucher: '100', materialPrice: '9000', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
+          { id: 2, purchaseOrderNumber:'NB002', warehouse: '2022-01-01', vendorNumber:'PO-002', vendorName: 'supplier2', createDate: '2022-01-01', noInvoice: 'NSJ-002', item: 'NFP-002', itemDescription: '2000', qtyVoucher: '100', materialPrice: '1900', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
+          { id: 3, purchaseOrderNumber:'NB003', warehouse: '2022-06-01', vendorNumber:'PO-003', vendorName: 'supplier3', createDate: '2022-06-01', noInvoice: 'NSJ-003', item: 'NFP-003', itemDescription: '3000', qtyVoucher: '100', materialPrice: '2900', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReportDetails`, {
+        status: 200,
+        body: body
+      }).as('getData');
       cy.get('button.print-purchase-report-detail').click()
       cy.get('.modal-print-purchase-report-detail-progress').should('be.visible')
       cy.contains('th','No.')
@@ -132,6 +256,55 @@ describe('purchase report detail',() => {
       cy.contains('th','After Discount')
       cy.contains('th','PPN')
       cy.contains('th','Total')
+      cy.wait('@getData')
+      cy.get('td.no').each(($td, index)=>{
+        expect($td.text()).to.equal(index)
+      })
+      cy.get('td.purchaseOrderNum').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].purchaseOrderNumber)
+      })
+      cy.get('td.Warehouse').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].warehouse)
+      })
+      cy.get('td.vendorNo').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].vendorNumber)
+      })
+      cy.get('td.vendorName').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].vendorName)
+      })
+      cy.get('td.noInvoice').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].noInvoice)
+      })
+      cy.get('td.createDate').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].createDate)
+      })
+      cy.get('td.item').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].item)
+      })
+      cy.get('td.itemDescription').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].itemDescription)
+      })
+      cy.get('td.qtyVoucher').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].qtyVoucher)
+      })
+      cy.get('td.materialPrice').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].materialPrice)
+      })
+      cy.get('td.materialPriceConv').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].materialPriceConversion)
+      })
+      cy.get('td.discount').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].discount)
+      })
+      cy.get('td.afterDiscount').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].afterDiscount)
+      })
+      cy.get('td.ppn').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].ppn)
+      })
+      cy.get('td.total').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReportDetails[index].total)
+      })
     })
   })
 })

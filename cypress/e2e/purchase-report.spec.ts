@@ -1,7 +1,7 @@
 describe('purchase report',() => {
   describe('user not login', () => {
     beforeEach(() => {
-      cy.visit('/purchase/report')
+      cy.visit('/purchase-report')
     })
     it('redirect to login page', () => {
       cy.location('pathname').should('eq', '/login')
@@ -10,12 +10,51 @@ describe('purchase report',() => {
   describe('user login', () => {
     beforeEach(() => {
       cy.visit('/login')
-      cy.get('button.login-google').click()
-      cy.visit('/')
-      cy.visit('/purchase/report')
+      cy.intercept('POST', `http://localhost:3000/v1/auth/signin`, (req) => {
+        const requestBody = JSON.parse(req.body);
+  
+        expect(requestBody).to.deep.equal({
+          email: 'admin',
+          password: 'admin123',
+        });
+        
+        req.headers['authorization'] = 'Basic YWxhZGRpbjpvcGVuc2VzYW1l'
+  
+        req.reply({
+          status: 200,
+          body: {
+            accessToken: 'string12345'
+          }
+        })
+      }).as('login')
+      cy.visit('/template')
+      cy.get('input[name="email"]').type('admin')
+      cy.get('input[name="password"]').type('admin123')
+      cy.get('button#login').click()
+      
+      cy.wait('@login')
+      cy.location('pathname').should('eq', '/')
+      cy.visit('/purchase-report')
     })
 
     it('show page purchase report', () => {
+      const body = {
+        purchaseReports: [
+          { id: 1, noBukti:'NB001', dateInvoice: '2023-01-01', purchaseInvoice:'PO-001', supplier: 'supplier1', noFaktur: 'NF-001', noSuratJalan: 'NSJ-001', noFakturPajak: 'NFP-001', dpp: '1000', ppn: '100', total: '900' },
+          { id: 2, noBukti:'NB002', dateInvoice: '2022-01-01', purchaseInvoice:'PO-002', supplier: 'supplier2', noFaktur: 'NF-002', noSuratJalan: 'NSJ-002', noFakturPajak: 'NFP-002', dpp: '2000', ppn: '100', total: '1900' },
+          { id: 3, noBukti:'NB003', dateInvoice: '2022-06-01', purchaseInvoice:'PO-003', supplier: 'supplier3', noFaktur: 'NF-003', noSuratJalan: 'NSJ-003', noFakturPajak: 'NFP-003', dpp: '3000', ppn: '100', total: '2900' },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReports`, {
+        status: 200,
+        body: body
+      }).as('getData');
       cy.contains('th','No.')
       cy.contains('th','No. Bukti')
       cy.contains('th','Date Invoice')
@@ -27,18 +66,61 @@ describe('purchase report',() => {
       cy.contains('th','DPP')
       cy.contains('th','PPN')
       cy.contains('th','Total')
+      cy.wait('@getData')
+      cy.get('td.no').each(($td, index)=>{
+        expect($td.text()).to.equal(index)
+      })
+      cy.get('td.noBukti').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].noBukti)
+      })
+      cy.get('td.dateInvoice').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].dateInvoice)
+      })
+      cy.get('td.purchaseDate').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].purchaseInvoice)
+      })
+      cy.get('td.supplier').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].supplier)
+      })
+      cy.get('td.noFaktur').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].noFaktur)
+      })
+      cy.get('td.noSuratJalan').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].noSuratJalan)
+      })
+      cy.get('td.noFakturPajak').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].noFakturPajak)
+      })
+      cy.get('td.dpp').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].dpp)
+      })
+      cy.get('td.ppn').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].ppn)
+      })
+      cy.get('td.total').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].total)
+      })
     })
     it('show page purchase report, with filter', () => {
       const dateFrom = '2022-01-01'
       const dateTo = '2023-01-01'
       const supplier = 'PT ABC'
-      cy.intercept('GET', `/api/v1/purchaseReport?filter[dateFrom]=${dateFrom}&filter[dateTo]=${dateTo}&filter[supplier]=${supplier}`, {
+      const body = {
+        purchaseReports: [
+          { id: 1, noBukti:'NB001', dateInvoice: '2023-01-01', purchaseInvoice:'PO-001', supplier: supplier, noFaktur: 'NF-001', noSuratJalan: 'NSJ-001', noFakturPajak: 'NFP-001', dpp: '1000', ppn: '100', total: '900' },
+          { id: 2, noBukti:'NB002', dateInvoice: '2022-01-01', purchaseInvoice:'PO-002', supplier: supplier, noFaktur: 'NF-002', noSuratJalan: 'NSJ-002', noFakturPajak: 'NFP-002', dpp: '2000', ppn: '100', total: '1900' },
+          { id: 3, noBukti:'NB003', dateInvoice: '2022-06-01', purchaseInvoice:'PO-003', supplier: supplier, noFaktur: 'NF-003', noSuratJalan: 'NSJ-003', noFakturPajak: 'NFP-003', dpp: '3000', ppn: '100', total: '2900' },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReports?filter[dateFrom]=${dateFrom}&filter[dateTo]=${dateTo}&filter[supplier]=${supplier}`, {
         status: 200,
-        body: [
-          { id: 1, dateInvoice: '2023-01-01', supplier: supplier },
-          { id: 2, dateInvoice: '2022-01-01', supplier: supplier },
-          { id: 3, dateInvoice: '2022-06-01', supplier: supplier },
-        ]
+        body: body
       }).as('getData');
       cy.get('input[name="dateFrom"]').type(dateFrom)
       cy.get('input[name="dateTo"]').type(dateTo)
@@ -55,12 +137,22 @@ describe('purchase report',() => {
     })
     it('show page purchase report, with search', () => {
       const supplierSearch = 'supplier test';
-      cy.intercept('GET', `/api/v1/purchaseReport?search=${supplierSearch}`, {
+      const body = {
+        purchaseReports: [
+          { id: 1, noBukti:'NB001', dateInvoice: '2023-01-01', purchaseInvoice:'PO-001', supplier: supplierSearch, noFaktur: 'NF-001', noSuratJalan: 'NSJ-001', noFakturPajak: 'NFP-001', dpp: '1000', ppn: '100', total: '900' },
+          { id: 2, noBukti:'NB002', dateInvoice: '2022-01-01', purchaseInvoice:'PO-002', supplier: supplierSearch, noFaktur: 'NF-002', noSuratJalan: 'NSJ-002', noFakturPajak: 'NFP-002', dpp: '2000', ppn: '100', total: '1900' },
+          { id: 3, noBukti:'NB003', dateInvoice: '2022-06-01', purchaseInvoice:'PO-003', supplier: supplierSearch, noFaktur: 'NF-003', noSuratJalan: 'NSJ-003', noFakturPajak: 'NFP-003', dpp: '3000', ppn: '100', total: '2900' },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReports?search[supplier]=${supplierSearch}`, {
         status: 200,
-        body: [
-          { id: 1, supplier: supplierSearch },
-          { id: 2, supplier: supplierSearch },
-        ]
+        body: body
       }).as('getData');
       
       cy.get('input[name="search"]').type(supplierSearch)
@@ -99,6 +191,23 @@ describe('purchase report',() => {
       cy.contains('Downloading... please wait')
     })
     it('print purchase report', () => {
+      const body = {
+        purchaseReports: [
+          { id: 1, noBukti:'NB001', dateInvoice: '2023-01-01', purchaseInvoice:'PO-001', supplier: 'supplier1', noFaktur: 'NF-001', noSuratJalan: 'NSJ-001', noFakturPajak: 'NFP-001', dpp: '1000', ppn: '100', total: '900' },
+          { id: 2, noBukti:'NB002', dateInvoice: '2022-01-01', purchaseInvoice:'PO-002', supplier: 'supplier2', noFaktur: 'NF-002', noSuratJalan: 'NSJ-002', noFakturPajak: 'NFP-002', dpp: '2000', ppn: '100', total: '1900' },
+          { id: 3, noBukti:'NB003', dateInvoice: '2022-06-01', purchaseInvoice:'PO-003', supplier: 'supplier3', noFaktur: 'NF-003', noSuratJalan: 'NSJ-003', noFakturPajak: 'NFP-003', dpp: '3000', ppn: '100', total: '2900' },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReports`, {
+        status: 200,
+        body: body
+      }).as('getData');
       cy.get('button.print-purchase-report').click()
       cy.get('.modal-print-purchase-report-progress').should('be.visible')
       cy.contains('th','No.')
@@ -112,6 +221,40 @@ describe('purchase report',() => {
       cy.contains('th','DPP')
       cy.contains('th','PPN')
       cy.contains('th','Total')
+      cy.wait('@getData')
+      cy.get('td.no').each(($td, index)=>{
+        expect($td.text()).to.equal(index)
+      })
+      cy.get('td.noBukti').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].noBukti)
+      })
+      cy.get('td.dateInvoice').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].dateInvoice)
+      })
+      cy.get('td.purchaseDate').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].purchaseInvoice)
+      })
+      cy.get('td.supplier').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].supplier)
+      })
+      cy.get('td.noFaktur').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].noFaktur)
+      })
+      cy.get('td.noSuratJalan').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].noSuratJalan)
+      })
+      cy.get('td.noFakturPajak').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].noFakturPajak)
+      })
+      cy.get('td.dpp').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].dpp)
+      })
+      cy.get('td.ppn').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].ppn)
+      })
+      cy.get('td.total').each(($td, index)=>{
+        expect($td.text()).to.equal(body.purchaseReports[index].total)
+      })
     })
   })
 })

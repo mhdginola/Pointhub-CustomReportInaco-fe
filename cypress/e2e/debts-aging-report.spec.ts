@@ -10,12 +10,51 @@ describe('debts aging report',() => {
   describe('user login', () => {
     beforeEach(() => {
       cy.visit('/login')
-      cy.get('button.login-google').click()
-      cy.visit('/')
+      cy.intercept('POST', `${Cypress.env('BASE_API_URL')}/auth/signin`, (req) => {
+        const requestBody = JSON.parse(req.body);
+  
+        expect(requestBody).to.deep.equal({
+          email: 'admin',
+          password: 'admin123',
+        });
+        
+        req.headers['authorization'] = 'Basic YWxhZGRpbjpvcGVuc2VzYW1l'
+  
+        req.reply({
+          status: 200,
+          body: {
+            accessToken: 'string12345'
+          }
+        })
+      }).as('login')
+      cy.visit('/template')
+      cy.get('input[name="email"]').type('admin')
+      cy.get('input[name="password"]').type('admin123')
+      cy.get('button#login').click()
+      
+      cy.wait('@login')
+      cy.location('pathname').should('eq', '/')
       cy.visit('/debts-aging-report')
     })
 
     it('show page debts aging report', () => {
+      const body = {
+        debtsAgingReports: [
+          { id: 1, productCode: 'wr1', invoiceNumber:'NB001', invoiceDate: '2023-01-01', customerWarehouse:'PO-001', customer: 'supplier1', name: '2023-01-01', invoiceAmount: 'NSJ-001', payment: 'nacme1', remaining: '1000' },
+          { id: 2, productCode: 'wr2', invoiceNumber:'NB002', invoiceDate: '2022-01-01', customerWarehouse:'PO-002', customer: 'supplier2', name: '2022-01-01', invoiceAmount: 'NSJ-002', payment: 'nacme2', remaining: '2000' },
+          { id: 3, productCode: 'wr3', invoiceNumber:'NB003', invoiceDate: '2022-06-01', customerWarehouse:'PO-003', customer: 'supplier3', name: '2022-06-01', invoiceAmount: 'NSJ-003', payment: 'nacme3', remaining: '3000' },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/debtsAgingReports`, {
+        status: 200,
+        body: body
+      }).as('getData')
       cy.contains('th','Product Code')
       cy.contains('th','Name')
       cy.contains('th','Date Invoice')
@@ -30,45 +69,139 @@ describe('debts aging report',() => {
       cy.contains('th','Debit Memo')
       cy.contains('th','CN')
       cy.contains('th','Remaining')
+      
+      cy.wait('@getData')
+      cy.get('td.no').each(($td, index)=>{
+        expect($td.text()).to.equal(index)
+      })
+      cy.get('td.productCode').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].productCode)
+      })
+      cy.get('td.name').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].name)
+      })
+      cy.get('td.invoiceDate').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].invoiceDate)
+      })
+      cy.get('td.customer').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].customer)
+      })
+      cy.get('td.invoiceNumber').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].invoiceNumber)
+      })
+      cy.get('td.invoiceAmount').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].invoiceAmount)
+      })
+      cy.get('td.payment').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].payment)
+      })
+      cy.get('td.remaining').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].remaining)
+      })
     })
     it('show page debt aging report, with filter', () => {
       const dateInvoice = '2022-01-01'
       const customer = 'PT ABC'
-      cy.intercept('GET', `/api/v1/debtAgingReport?filter[date]=${dateInvoice}&filter[customer]=${customer}`, {
+      const body = {
+        debtsAgingReports: [
+          { id: 1, productCode: 'wr1', invoiceNumber:'NB001', invoiceDate: dateInvoice, customerWarehouse:'PO-001', customer: customer, name: '2023-01-01', invoiceAmount: 'NSJ-001', payment: 'nacme1', remaining: '1000' },
+          { id: 2, productCode: 'wr2', invoiceNumber:'NB002', invoiceDate: dateInvoice, customerWarehouse:'PO-002', customer: customer, name: '2022-01-01', invoiceAmount: 'NSJ-002', payment: 'nacme2', remaining: '2000' },
+          { id: 3, productCode: 'wr3', invoiceNumber:'NB003', invoiceDate: dateInvoice, customerWarehouse:'PO-003', customer: customer, name: '2022-06-01', invoiceAmount: 'NSJ-003', payment: 'nacme3', remaining: '3000' },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/debtsAgingReports?filter[date]=${dateInvoice}&filter[customer]=${customer}`, {
         status: 200,
-        body: [
-          { id: 1, dateInvoice: dateInvoice, customer: customer },
-          { id: 2, dateInvoice: dateInvoice, customer: customer },
-          { id: 2, dateInvoice: dateInvoice, customer: customer },
-        ]
+        body: body
       }).as('getData');
       cy.get('input[name="date"]').type(dateInvoice)
       cy.get('select[name="customer"]').select(customer)
       cy.get('button#filter').click()
+      
       cy.wait('@getData')
-      cy.get('td#dateInvoice').each(($td) => {
-        expect(new Date($td.text())).to.equal(new Date(dateInvoice));
+      cy.get('td.no').each(($td, index)=>{
+        expect($td.text()).to.equal(index)
       })
-      cy.get('td#dataCustomer').each(($td) => {
-        expect($td.text()).to.equal(customer);
+      cy.get('td.productCode').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].productCode)
+      })
+      cy.get('td.name').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].name)
+      })
+      cy.get('td.invoiceDate').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].invoiceDate)
+      })
+      cy.get('td.customer').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].customer)
+      })
+      cy.get('td.invoiceNumber').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].invoiceNumber)
+      })
+      cy.get('td.invoiceAmount').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].invoiceAmount)
+      })
+      cy.get('td.payment').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].payment)
+      })
+      cy.get('td.remaining').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].remaining)
       })
     })
     it('show page debt aging report, with search', () => {
       const customerSearch = 'customer test';
-      cy.intercept('GET', `/api/v1/debtAgingReport?search=${customerSearch}`, {
+      const body = {
+        debtsAgingReports: [
+          { id: 1, productCode: 'wr1', invoiceNumber:'NB001', invoiceDate: 'dateInvoice', customerWarehouse:'PO-001', customer: customerSearch, name: '2023-01-01', invoiceAmount: 'NSJ-001', payment: 'nacme1', remaining: '1000' },
+          { id: 2, productCode: 'wr2', invoiceNumber:'NB002', invoiceDate: 'dateInvoice', customerWarehouse:'PO-002', customer: customerSearch, name: '2022-01-01', invoiceAmount: 'NSJ-002', payment: 'nacme2', remaining: '2000' },
+          { id: 3, productCode: 'wr3', invoiceNumber:'NB003', invoiceDate: 'dateInvoice', customerWarehouse:'PO-003', customer: customerSearch, name: '2022-06-01', invoiceAmount: 'NSJ-003', payment: 'nacme3', remaining: '3000' },
+        ],
+        pagination: {
+          page: 1,
+          pageSize: 10,
+          pageCount: 1,
+          totalDocument: 3,
+        }
+      }
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/debtsAgingReports?search=${customerSearch}`, {
         status: 200,
-        body: [
-          { id: 1, customer: customerSearch },
-          { id: 2, customer: customerSearch },
-        ]
+        body: body
       }).as('getData');
       
       cy.get('input[name="search"]').type(customerSearch)
       cy.get('button#search').click()
 
       cy.wait('@getData')
-      cy.get('td#dataCustomer').each(($td) => {
-        expect($td.text()).to.contain(customerSearch);
+      cy.get('td.no').each(($td, index)=>{
+        expect($td.text()).to.equal(index)
+      })
+      cy.get('td.productCode').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].productCode)
+      })
+      cy.get('td.name').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].name)
+      })
+      cy.get('td.invoiceDate').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].invoiceDate)
+      })
+      cy.get('td.customer').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].customer)
+      })
+      cy.get('td.invoiceNumber').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].invoiceNumber)
+      })
+      cy.get('td.invoiceAmount').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].invoiceAmount)
+      })
+      cy.get('td.payment').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].payment)
+      })
+      cy.get('td.remaining').each(($td, index)=>{
+        expect($td.text()).to.equal(body.debtsAgingReports[index].remaining)
       })
     })
     it('should navigate through pages correctly', () => {
