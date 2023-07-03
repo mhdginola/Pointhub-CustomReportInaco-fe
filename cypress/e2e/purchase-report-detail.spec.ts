@@ -78,7 +78,7 @@ describe('purchase report detail',() => {
       cy.get('td.purchaseOrderNum').each(($td, index)=>{
         expect($td.text()).to.equal(body.purchaseReportDetails[index].purchaseOrderNumber)
       })
-      cy.get('td.Warehouse').each(($td, index)=>{
+      cy.get('td.warehouse').each(($td, index)=>{
         expect($td.text()).to.equal(body.purchaseReportDetails[index].warehouse)
       })
       cy.get('td.vendorNo').each(($td, index)=>{
@@ -124,9 +124,9 @@ describe('purchase report detail',() => {
     it('show page purchase report detail, with filter', () => {
       const dateFrom = '2022-01-01'
       const dateTo = '2023-01-01'
-      const supplier = 'PT ABC'
-      const item = 'item test'
-      const warehouse = 'warehouse test'
+      const supplier = 'PTABC'
+      const item = 'itemTest'
+      const warehouse = 'warehouseTest'
       const body = {
         purchaseReportDetails: [
           { id: 1, purchaseOrderNumber:'NB001', warehouse: warehouse, vendorNumber:'PO-001', vendorName: supplier, createDate: 'NF-001', noInvoice: 'NSJ-001', item: item, itemDescription: '1000', qtyVoucher: '100', materialPrice: '9000', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
@@ -140,7 +140,7 @@ describe('purchase report detail',() => {
           totalDocument: 3,
         }
       }
-      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReportDetails?filter[dateFrom]=${dateFrom}&filter[dateTo]=${dateTo}&filter[supplier]=${supplier}&filter[item]=${item}&filter[warehouse]=${warehouse}`, {
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReportDetails?filter[dateFrom]=${encodeURI(dateFrom)}&filter[dateTo]=${encodeURI(dateTo)}&filter[supplier]=${encodeURI(supplier)}&filter[item]=${encodeURI(item)}&filter[warehouse]=${encodeURI(warehouse)}`, {
         status: 200,
         body: body
       }).as('getData');
@@ -166,7 +166,7 @@ describe('purchase report detail',() => {
       })
     })
     it('show page purchase report detail, with search', () => {
-      const supplierSearch = 'supplier test';
+      const supplierSearch = 'supplierTest';
       const body = {
         purchaseReportDetails: [
           { id: 1, purchaseOrderNumber:'NB001', warehouse: '2023-01-01', vendorNumber:'PO-001', vendorName: supplierSearch, createDate: '2023-01-01', noInvoice: 'NSJ-001', item: 'NFP-001', itemDescription: '1000', qtyVoucher: '100', materialPrice: '9000', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
@@ -180,7 +180,7 @@ describe('purchase report detail',() => {
           totalDocument: 3,
         }
       }
-      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReportDetails?search[supplier]=${supplierSearch}`, {
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReportDetails?search[supplier]=${encodeURI(supplierSearch)}`, {
         status: 200,
         body: body
       }).as('getData');
@@ -263,7 +263,7 @@ describe('purchase report detail',() => {
       cy.get('td.purchaseOrderNum').each(($td, index)=>{
         expect($td.text()).to.equal(body.purchaseReportDetails[index].purchaseOrderNumber)
       })
-      cy.get('td.Warehouse').each(($td, index)=>{
+      cy.get('td.warehouse').each(($td, index)=>{
         expect($td.text()).to.equal(body.purchaseReportDetails[index].warehouse)
       })
       cy.get('td.vendorNo').each(($td, index)=>{

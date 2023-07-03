@@ -104,7 +104,7 @@ describe('purchase report',() => {
     it('show page purchase report, with filter', () => {
       const dateFrom = '2022-01-01'
       const dateTo = '2023-01-01'
-      const supplier = 'PT ABC'
+      const supplier = 'PTABC'
       const body = {
         purchaseReports: [
           { id: 1, noBukti:'NB001', dateInvoice: '2023-01-01', purchaseInvoice:'PO-001', supplier: supplier, noFaktur: 'NF-001', noSuratJalan: 'NSJ-001', noFakturPajak: 'NFP-001', dpp: '1000', ppn: '100', total: '900' },
@@ -118,7 +118,7 @@ describe('purchase report',() => {
           totalDocument: 3,
         }
       }
-      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReports?filter[dateFrom]=${dateFrom}&filter[dateTo]=${dateTo}&filter[supplier]=${supplier}`, {
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReports?filter[dateFrom]=${encodeURI(dateFrom)}&filter[dateTo]=${encodeURI(dateTo)}&filter[supplier]=${encodeURI(supplier)}`, {
         status: 200,
         body: body
       }).as('getData');
@@ -136,7 +136,7 @@ describe('purchase report',() => {
       })
     })
     it('show page purchase report, with search', () => {
-      const supplierSearch = 'supplier test';
+      const supplierSearch = 'supplierTest';
       const body = {
         purchaseReports: [
           { id: 1, noBukti:'NB001', dateInvoice: '2023-01-01', purchaseInvoice:'PO-001', supplier: supplierSearch, noFaktur: 'NF-001', noSuratJalan: 'NSJ-001', noFakturPajak: 'NFP-001', dpp: '1000', ppn: '100', total: '900' },
@@ -150,7 +150,7 @@ describe('purchase report',() => {
           totalDocument: 3,
         }
       }
-      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReports?search[supplier]=${supplierSearch}`, {
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/purchaseReports?search[supplier]=${encodeURI(supplierSearch)}`, {
         status: 200,
         body: body
       }).as('getData');

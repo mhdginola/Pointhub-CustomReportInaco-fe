@@ -71,7 +71,7 @@ describe('sales report',() => {
       cy.get('td.no').each(($td, index)=>{
         expect($td.text()).to.equal(index)
       })
-      cy.get('td.Warehouse').each(($td, index)=>{
+      cy.get('td.warehouse').each(($td, index)=>{
         expect($td.text()).to.equal(body.salesReports[index].warehouse)
       })
       cy.get('td.item').each(($td, index)=>{
@@ -123,7 +123,7 @@ describe('sales report',() => {
           totalDocument: 3,
         }
       }
-      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/salesReports?filter[dateFrom]=${dateFrom}&filter[dateTo]=${dateTo}&filter[item]=${item}&filter[warehouse]=${warehouse}`, {
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/salesReports?filter[dateFrom]=${encodeURI(dateFrom)}&filter[dateTo]=${encodeURI(dateTo)}&filter[item]=${encodeURI(item)}&filter[warehouse]=${encodeURI(warehouse)}`, {
         status: 200,
         body: body
       }).as('getData');
@@ -136,7 +136,7 @@ describe('sales report',() => {
       cy.get('td.no').each(($td, index)=>{
         expect($td.text()).to.equal(index)
       })
-      cy.get('td.Warehouse').each(($td, index)=>{
+      cy.get('td.warehouse').each(($td, index)=>{
         expect($td.text()).to.equal(body.salesReports[index].warehouse)
       })
       cy.get('td.item').each(($td, index)=>{
@@ -185,7 +185,7 @@ describe('sales report',() => {
           totalDocument: 3,
         }
       }
-      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/salesReports?search=${itemSearch}`, {
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/salesReports?search=${encodeURI(itemSearch)}`, {
         status: 200,
         body: body
       }).as('getData');
@@ -197,7 +197,7 @@ describe('sales report',() => {
       cy.get('td.no').each(($td, index)=>{
         expect($td.text()).to.equal(index)
       })
-      cy.get('td.Warehouse').each(($td, index)=>{
+      cy.get('td.warehouse').each(($td, index)=>{
         expect($td.text()).to.equal(body.salesReports[index].warehouse)
       })
       cy.get('td.item').each(($td, index)=>{

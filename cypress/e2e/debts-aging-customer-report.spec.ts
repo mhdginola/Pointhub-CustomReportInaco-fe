@@ -125,7 +125,7 @@ describe('debts aging per customer report',() => {
           totalDocument: 3,
         }
       }
-      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/debtsAgingReportPerCustomers?filter[date]=${dateInvoice}&filter[customer]=${customer}`, {
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/debtsAgingReportPerCustomers?filter[date]=${encodeURI(dateInvoice)}&filter[customer]=${encodeURI(customer)}`, {
         status: 200,
         body: body
       }).as('getData');
@@ -189,7 +189,7 @@ describe('debts aging per customer report',() => {
           totalDocument: 3,
         }
       }
-      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/debtsAgingReportPerCustomers?search=${customerSearch}`, {
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/debtsAgingReportPerCustomers?search=${encodeURI(customerSearch)}`, {
         status: 200,
         body: body
       }).as('getData');
