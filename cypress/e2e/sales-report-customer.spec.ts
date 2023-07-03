@@ -120,7 +120,7 @@ describe('sales report customer',() => {
           totalDocument: 3,
         }
       }
-      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/salesReportPerCustomers?filter[dateFrom]=${dateFrom}&filter[dateTo]=${dateTo}&filter[customer]=${customer}`, {
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/salesReportPerCustomers?filter[dateFrom]=${encodeURI(dateFrom)}&filter[dateTo]=${encodeURI(dateTo)}&filter[customer]=${encodeURI(customer)}`, {
         status: 200,
         body: body
       }).as('getData');
@@ -179,7 +179,7 @@ describe('sales report customer',() => {
           totalDocument: 3,
         }
       }
-      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/salesReportPerCustomers?search=${customerSearch}`, {
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/salesReportPerCustomers?search=${encodeURI(customerSearch)}`, {
         status: 200,
         body: body
       }).as('getData');

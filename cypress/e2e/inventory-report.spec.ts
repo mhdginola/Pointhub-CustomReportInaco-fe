@@ -102,8 +102,8 @@ describe('inventory report',() => {
     it('show page inventory report, with filter', () => {
       const dateFrom = '2022-01-01'
       const dateTo = '2023-01-01'
-      const item = 'item test'
-      const warehouse = 'warehouse test'
+      const item = 'itemTest'
+      const warehouse = 'warehouseTest'
       const body = {
         inventoryReports: [
           { id: 1, warehouse: warehouse, item: item, description: '2023-01-01', quantityInStock:'PO-001', issuesQuantity: 'supplier1', unitCost: '2023-01-01', startBalanceCost: 'NSJ-001', receiptsAmount: 'nacme1', issuesAmount: '1000' },
@@ -117,7 +117,7 @@ describe('inventory report',() => {
           totalDocument: 3,
         }
       }
-      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/inventoryReports?filter[dateFrom]=${dateFrom}&filter[dateTo]=${dateTo}&filter[item]=${item}&filter[warehouse]=${warehouse}`, {
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/inventoryReports?filter[dateFrom]=${encodeURI(dateFrom)}&filter[dateTo]=${encodeURI(dateTo)}&filter[item]=${encodeURI(item)}&filter[warehouse]=${encodeURI(warehouse)}`, {
         status: 200,
         body: body
       }).as('getData');
@@ -174,7 +174,7 @@ describe('inventory report',() => {
           totalDocument: 3,
         }
       }
-      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/inventoryReports?search=${itemSearch}`, {
+      cy.intercept('GET', `${Cypress.env('BASE_API_URL')}/inventoryReports?search=${encodeURI(itemSearch)}`, {
         status: 200,
         body: body
       }).as('getData');
