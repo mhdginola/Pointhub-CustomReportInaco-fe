@@ -1,7 +1,7 @@
 const warehouses = [
-    {id: 1, label: 'warehouse test'},
-    {id: 2, label: 'warehouse test 2'},
-    {id: 3, label: 'PT ABC'},
+    {id: 'warehouse test', label: 'warehouse test'},
+    {id: 'warehouse test 2', label: 'warehouse test 2'},
+    {id: 'PT ABC', label: 'PT ABC'},
 ];
 
 export {

@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 import { BaseCheckbox } from '.';
 
 
-interface Column {
+export type Column = {
     name: string,
     label: string,
     hide?: boolean,
@@ -35,6 +35,10 @@ const props = defineProps({
     perPage: {
         type: Number,
         default: 10,
+    },
+    rowNumber: {
+        type: Boolean,
+        default: false
     }
 })
 
@@ -118,13 +122,11 @@ const toggleAllSelections = function(){
                         <th v-if="selectable" class="basic-table-head text-center">
                             <BaseCheckbox theme="info" :model-value="state.selectedRows.length === dataLength" @click="toggleAllSelections" />
                         </th>
+                        <th v-if="rowNumber" class="basic-table-head">No.</th>
                         <template v-for="column in columns" :key="column.name">
                             <th v-if="!column.hide" class="basic-table-head">
                                 <div class="flex items-center justify-between">
                                     <p>{{ column.label }}</p>
-                                    <button>
-                                        <i class="i-far-arrow-up-z-a block"></i>
-                                    </button>
                                 </div>
                             </th>
                         </template>
@@ -135,8 +137,11 @@ const toggleAllSelections = function(){
                         <td v-if="selectable" class="basic-table-head text-center">
                             <BaseCheckbox theme="info" :model-value="state.selectedRows.includes(item.id)" @update:model-value="selectRow(item.id)" />
                         </td>
+                        <td v-if="rowNumber" class="no basic-table-body">
+                            {{ (index + 1) + ((state.currentPage - 1) * props.perPage) }}
+                        </td>
                         <template v-for="column in columns" :key="column.name">
-                            <td :id="column.name" v-if="!column.hide" class="basic-table-body">{{ item[column.name] ?? '-' }}</td>
+                            <td v-if="!column.hide" :class="'basic-table-body ' + column.name">{{ item[column.name] ?? '-' }}</td>
                         </template>
                     </tr>
                 </tbody>

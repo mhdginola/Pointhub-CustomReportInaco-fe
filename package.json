@@ -29,6 +29,7 @@
     "dayjs": "^1.11.7",
     "highlight.js": "^11.7.0",
     "pinia": "^2.0.36",
+    "query-string": "^8.1.0",
     "vite-plugin-env-compatible": "^1.1.1",
     "vue": "^3.3.2",
     "vue-router": "^4.2.0",

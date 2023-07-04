@@ -13,45 +13,20 @@ export const routes = {
       component: () => import('./views/page-index.vue'),
     },
     {
-      path: 'dashboard',
-      component: () => import('./views/page-dashboard.vue'),
-    },
-    {
-      path: 'page-1',
-      component: () => import('./views/page-1.vue'),
-    },
-    {
-      path: 'page-2',
-      component: () => import('./views/page-2.vue'),
-    },
-    {
-      path: 'nested',
-      children: [
-        {
-          path: 'page-nested-1',
-          component: () => import('./views/nested/page-nested-1.vue'),
-        },
-        {
-          path: 'page-nested-2',
-          component: () => import('./views/nested/page-nested-2.vue'),
-        },
-      ],
-    },
-    {
       path: 'sales',
       meta: {
         label: 'Sales',
       },
       children: [
         {
-          path: 'report',
+          path: 'sales-report',
           meta: {
             label: 'Sales Report',
           },
           component: () => import('./views/sales/page-sales-report.vue'),
         },
         {
-          path: 'customer-report',
+          path: 'sales-report-customer',
           meta: {
             label: 'Sales Report per Customer',
           },
@@ -69,14 +44,14 @@ export const routes = {
           meta: {
             label: 'Purchase Report',
           },
-          path: 'report',
+          path: 'purchase-report',
           component: () => import('./views/purchase/page-purchase-report.vue'),
         },
         {
           meta: {
             label: 'Purchase Report Details',
           },
-          path: 'report-details',
+          path: 'purchase-report-details',
           component: () => import('./views/purchase/page-purchase-report-details.vue'),
         },
       ],
@@ -105,12 +80,15 @@ export const routes = {
     },
     {
       path: 'inventory',
+      meta: {
+        label: 'Inventory',
+      },
       children: [
         {
           meta: {
             label: 'Inventory Report',
           },
-          path: 'report',
+          path: 'inventory-report',
           component: () => import('./views/inventory/page-inventory-report.vue'),
         },
       ],

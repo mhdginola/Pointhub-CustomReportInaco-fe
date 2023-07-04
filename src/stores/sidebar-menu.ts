@@ -107,36 +107,15 @@ const menuMain = {
       path: '/dashboard'
     },
     {
-      name: 'Page 1',
-      path: '/page-1'
-    },
-    {
-      name: 'Page 2',
-      path: '/page-2'
-    },
-    {
-      name: 'Nested',
-      submenu: [
-        {
-          name: 'Page Nested 1',
-          path: '/nested/page-nested-1'
-        },
-        {
-          name: 'Page Nested 2',
-          path: '/nested/page-nested-2'
-        }
-      ]
-    },
-    {
       name: 'Purchase',
       submenu: [
         {
           name: 'Purchase Report',
-          path: '/purchase/report'
+          path: '/purchase/purchase-report'
         },
         {
           name: 'Purchase Report Details',
-          path: '/purchase/report-details'
+          path: '/purchase/purchase-report-details'
         }
       ]
     },
@@ -145,11 +124,11 @@ const menuMain = {
       submenu: [
         {
           name: 'Sales Report',
-          path: '/sales/report'
+          path: '/sales/sales-report'
         },
         {
           name: 'Sales Customer Report',
-          path: '/sales/customer-report'
+          path: '/sales/sales-report-customer'
         }
       ]
     },
@@ -171,7 +150,7 @@ const menuMain = {
       submenu: [
         {
           name: 'Inventory Report',
-          path: '/inventory/report'
+          path: '/inventory/inventory-report'
         },
       ]
     }

@@ -1,69 +1,23 @@
 <script setup lang="ts">
-import { BaseInputMask, BaseSelect, BaseSelectMask, BaseModal, VTableFilters } from '@/components';
-import VTable from '@/components/v-table.vue';
-import { reactive, ref } from 'vue';
+import { VDatatable } from '@/components';
 import { suppliers, warehouses, items } from '@/data/index';
 
 const columns = [
-    {name: 'number', label: 'No'},
     {name: 'warehouse', label: 'Warehouse'},
-    {name: 'purchaseOrderNum', label: 'Purchase Order Num'},
-    {name: 'vendorNo', label: 'Vendor No.'},
+    {name: 'purchaseOrderNumber', label: 'Purchase Order Num'},
+    {name: 'vendorNumber', label: 'Vendor No.'},
     {name: 'vendorName', label: 'Vendor Name'},
     {name: 'createDate', label: 'Create Date'},
     {name: 'noInvoice', label: 'No. Invoice'},
     {name: 'item', label: 'Item'},
     {name: 'itemDescription', label: 'Item Description'},
     {name: 'qtyVoucher', label: 'Qty Voucher'},
-    {name: 'materialPriceConv', label: 'Material Price Conv'},
+    {name: 'materialPriceConversion', label: 'Material Price Conv'},
     {name: 'discount', label: 'Discount'},
     {name: 'afterDiscount', label: 'After Discount'},
     {name: 'ppn', label: 'PPN'},
     {name: 'total', label: 'Total'},
 ];
-
-const data: Array<any> = [
-    {
-        id: 1,
-        warehouse: '212412',
-        purchaseOrderNum: '243242',
-        createDate: '2021-02-22',
-        noInvoice: 'INV_2023_02_22',
-        total: 2354234
-    },
-    {
-        id: 2,
-        warehouse: '212412',
-        purchaseOrderNum: '243242',
-        createDate: '2021-02-22',
-        noInvoice: 'INV_2023_02_22',
-        total: 2354235
-    }
-];
-
-
-const state = reactive({
-    filters: {
-        dateFrom: '',
-        dateTo: '',
-        supplier: '',
-        warehouse: '',
-        item: '',
-    },
-    searchTerm: '',
-});
-
-const atoms = reactive({
-    isPrintModalOpen: false,
-    isDownloadModalOpen: false,
-});
-
-const initDownload = function(){
-    atoms.isDownloadModalOpen = true;
-    setTimeout(()=>{
-        atoms.isDownloadModalOpen = false;
-    }, 3000);
-}
 
 const filterFields = [
     {
@@ -71,16 +25,16 @@ const filterFields = [
         name: 'dateFrom',
         type: 'date',
         component: 'input',
-        options: { date: true, delimiter: '-', datePattern: ['d', 'm', 'Y'] },
-        placeholder: 'DD-MM-YYYY',
+        options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
+        placeholder: 'YYYY-MM-DD',
     },
     {
         label: 'Date To',
         name: 'dateTo',
         type: 'date',
         component: 'input',
-        options: { date: true, delimiter: '-', datePattern: ['d', 'm', 'Y'] },
-        placeholder: 'DD-MM-YYYY',
+        options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
+        placeholder: 'YYYY-MM-DD',
     },
     {
         label: 'Supplier',
@@ -105,77 +59,18 @@ const filterFields = [
     }
 ]
 
+const templateData = [
+    { id: 1, purchaseOrderNumber:'NB001', warehouse: '2023-01-01', vendorNumber:'PO-001', vendorName: 'supplier1', createDate: '2023-01-01', noInvoice: 'NSJ-001', item: 'NFP-001', itemDescription: '1000', qtyVoucher: '100', materialPrice: '9000', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
+    { id: 2, purchaseOrderNumber:'NB002', warehouse: '2022-01-01', vendorNumber:'PO-002', vendorName: 'supplier2', createDate: '2022-01-01', noInvoice: 'NSJ-002', item: 'NFP-002', itemDescription: '2000', qtyVoucher: '100', materialPrice: '1900', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
+    { id: 3, purchaseOrderNumber:'NB003', warehouse: '2022-06-01', vendorNumber:'PO-003', vendorName: 'supplier3', createDate: '2022-06-01', noInvoice: 'NSJ-003', item: 'NFP-003', itemDescription: '3000', qtyVoucher: '100', materialPrice: '2900', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },
+];
+
 </script>
 <template>
-    <div class="flex flex-col gap-2">
-        <div class="flex flex-row justify-end">
-            <div>
-                <button
-                    @click="atoms.isPrintModalOpen = true;"
-                    class="print-purchase-report-detail btn-icon">
-                    <i class="i-ph-printer"></i>
-                </button>
-                <button @click="initDownload()" class="download-purchase-report-detail btn-icon">
-                    <i class="i-ph-download"></i>
-                </button>
-            </div>
-        </div>
-        <VTableFilters :fields="filterFields" v-model="state.filters"/>
-        <div class="card card-template mt-2">
-            <div class="card-header">
-                <div class="w-full flex">
-                    <div class="flex-grow">
-                        <component
-                            :is="BaseInputMask"
-                            v-model="state.searchTerm"
-                            label="Search"
-                            name="search"
-                            placeholder="input a search term"
-                        ></component>
-                    </div>
-                    <button id="search" class="btn-sm btn-primary h-fit mt-auto">Go</button>
-                </div>
-            </div>
-        
-            <VTable
-                :selectable="true"
-                :columns="columns"
-                :data="data"
-                :per-page="1"
-            />
-        
-        </div>
-        <BaseModal
-            :is-open="atoms.isDownloadModalOpen"
-            size="sm"
-        >
-            <template #content>
-                <div class="modal-download-purchase-report-detail-progress max-h-90vh overflow-auto p-4">
-                    <div class="space-y-8 mx-auto text-center">
-                        <p>
-                            Downloading... please wait
-                        </p>
-                    </div>
-                </div>
-            </template>
-        </BaseModal>
-        <BaseModal
-            :is-open="atoms.isPrintModalOpen"
-            size="full"
-        >
-            <template #content>
-                <div class="modal-print-purchase-report-detail-progress max-h-90vh overflow-auto p-4">
-                    <h2 class="py-4 text-2xl font-bold">Lorem Ipsum</h2>
-                    <div class="space-y-8">
-                    <p>
-                        Lorem ipsum, dolor sit amet consectetur adipisicing elit. A accusantium provident,
-                        blanditiis quam pariatur repellat? Animi ducimus fugit, similique libero et rem,
-                        quod repellat sunt itaque voluptas nihil saepe laboriosam?
-                    </p>
-                    <button class="btn btn-primary btn-block" @click="atoms.isPrintModalOpen = false">Close</button>
-                    </div>
-                </div>
-            </template>
-        </BaseModal>
-    </div>
+    <VDatatable 
+        :filters="filterFields"
+        :columns="columns"
+        :template-data="templateData"
+        url="purchaseReports"
+    />
 </template>

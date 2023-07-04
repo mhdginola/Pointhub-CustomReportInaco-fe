@@ -6,8 +6,9 @@
     "composite": true,
     "baseUrl": "./src",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["*"]
     },
-    "ignoreDeprecations": "5.0"
+    "ignoreDeprecations": "5.0",
+    "verbatimModuleSyntax": false,
   }
 }

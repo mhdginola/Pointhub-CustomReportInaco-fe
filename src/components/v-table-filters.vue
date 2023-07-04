@@ -14,7 +14,8 @@ const getComponent = function(field: any){
     return 'div';
 }
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: any): void
+  (e: 'update:modelValue', value: any): void,
+  (e: 'submit'): void,
 }>()
 
 const computedStates = computed<any>({
@@ -37,7 +38,7 @@ const computedStates = computed<any>({
                 :label="field.label"
                 v-bind="field"
             />
-            <button class="btn-sm btn-primary w-fit" id="filter">Apply</button>
+            <button class="btn-sm btn-primary w-fit" id="filter" @click="$emit('submit')">Apply</button>
         </div>
     </div>
 </template>

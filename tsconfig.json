@@ -16,7 +16,8 @@
     "preserveValueImports": false,
     "isolatedModules": false,
     "paths": {
-      "@/*": ["./src/*"]
-    }
+      "@/*": ["*"]
+    },
+    "verbatimModuleSyntax": false,
   }
 }
