@@ -11,15 +11,19 @@ export const client = function(){
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-client.search = function(url: string, params: Object = {}, onSuccess = (r: any)=>{}){
+client.search = function(url: string, params: Object = {}){
     const serialized = serializeObject(params);
-    client().get(`/${url}${serialized? '?' + serialized: ''}`).then(r => {
-        onSuccess({
-            data: r.data[url],
-            pagination: r.data.pagination
+    return new Promise((resolve, reject) => {
+        client().get(`/${url}${serialized? '?' + serialized: ''}`).then(r => {
+            resolve({
+                data: r.data[url],
+                pagination: r.data.pagination
+            });
+        }, e => {
+            reject(e);
+        }).catch(e => {
+            reject(e);
         });
-    }).catch(e => {
-        console.log(e);
     });
 }
 

@@ -2,6 +2,7 @@
 import { onMounted, reactive } from 'vue';
 import { BaseInputMask, BaseModal, VTable, VTableFilters } from '@/components';
 import { client } from '@/config';
+import { Datum } from './v-table.vue';
 
 type Column = {
     name: string,
@@ -28,7 +29,7 @@ const props = defineProps({
     }
 });
 
-const state = reactive({
+const state = reactive<any>({
     filters: {},
     searchTerm: '',
     data: [],
@@ -46,12 +47,83 @@ const initDownload = function(){
     }, 3000);
 }
 
+const compareDate = function(date1: string, date2: string){
+    let d1 = new Date(date1);
+    let d2 = new Date(date2);
+
+    return d1.getTime() >= d2.getTime();
+}
+
+const updateSearch = function(){
+    // @ts-ignore
+    state.data = props.templateData.filter((t: any) => {
+        if(state.filters){
+            // @ts-ignore Column dateFrom and dateTo
+            if(state.filters.dateFrom){
+                let date = t.dateInvoice || t.invoiceDate || t.createDate;
+                if(date){
+                    if(!compareDate(date, state.filters.dateFrom)){
+                        return false;
+                    }
+                }
+            }
+            if(state.filters.dateTo){
+                let date = t.dateInvoice || t.invoiceDate;
+                if(date){
+                    if(!compareDate(state.filters.dateTo, date)){
+                        return false;
+                    }
+                }
+            }
+            if(state.filters.item){
+                if(t.item){
+                    if(t.item !== state.filters.item){
+                        return false;
+                    }
+                }
+            }
+            if(state.filters.customer){
+                let c = t.name || t.customer;
+                if(c){
+                    if(c !== state.filters.customer){
+                        return false;
+                    }
+                }
+            }
+            if(state.filters.warehouse){
+                if(t.warehouse){
+                    if(t.warehouse !== state.filters.warehouse){
+                        return false;
+                    }
+                }
+            }
+            if(state.filters.supplier){
+                if(t.supplier){
+                    if(t.supplier !== state.filters.supplier){
+                        return false;
+                    }
+                }
+            }
+        }
+
+        if(state.searchTerm){
+            if(!Object.values(t).some((i) => `${i}`?.toLowerCase().includes(state.searchTerm.toLowerCase()))){
+                return false;
+            }
+        }
+        return true;
+    });
+}
+
 const search = function(){
+    updateSearch();
     client.search(props.url, {
         filter: state.filters,
         search: state.searchTerm
-    }, function({data}: any){
+    }).then(function({data}: any){
         state.data = data;
+    }).catch(e => {
+        // updateSearch();
     });
 }
 

@@ -40,6 +40,12 @@ const value = computed({
   },
   get: () => props.modelValue
 })
+
+const takeInput = function(e: any){
+  if(!e.target.value){
+    emit('update:modelValue', '')
+  }
+}
 </script>
 
 <template>
@@ -80,6 +86,7 @@ const value = computed({
         :readonly="props.readonly"
         :disabled="props.disabled"
         :name="props.name"
+        @change="takeInput"
       />
       <slot name="helper" v-if="helper">
         <span class="text-sm font-light text-slate-500">{{ helper }}</span>

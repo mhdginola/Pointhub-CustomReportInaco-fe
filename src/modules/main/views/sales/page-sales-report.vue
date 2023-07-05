@@ -50,9 +50,9 @@ const filterFields = [
 ]
 
 const templateData = [
-    { id: 1, productCode:'NB001', warehouse: '2023-01-01', description:'PO-001', principle: 'supplier1', totalInvoiced: '2023-01-01', totalBeforeDiscount: 'NSJ-001', item: 'NFP-001', totalDiscount: '1000', totalAfterDiscount: '100', totalTax: '9000', totalAfterTax: '100',discount: '100' },
-    { id: 2, productCode:'NB002', warehouse: '2022-01-01', description:'PO-002', principle: 'supplier2', totalInvoiced: '2022-01-01', totalBeforeDiscount: 'NSJ-002', item: 'NFP-002', totalDiscount: '2000', totalAfterDiscount: '100', totalTax: '1900', totalAfterTax: '100',discount: '100' },
-    { id: 3, productCode:'NB003', warehouse: '2022-06-01', description:'PO-003', principle: 'supplier3', totalInvoiced: '2022-06-01', totalBeforeDiscount: 'NSJ-003', item: 'NFP-003', totalDiscount: '3000', totalAfterDiscount: '100', totalTax: '2900', totalAfterTax: '100',discount: '100' },
+    { id: 1, productCode:'NB001', warehouse: 'warehouse_test', description:'PO-001', principle: 'PT ABC', totalInvoiced: '2023-01-01', totalBeforeDiscount: 'NSJ-001', item: 'NFP-001', totalDiscount: '1000', totalAfterDiscount: '100', totalTax: '9000', totalAfterTax: '100',discount: '100' },
+    { id: 2, productCode:'NB002', warehouse: 'warehouse_test2', description:'PO-002', principle: 'PT ABC', totalInvoiced: '2022-01-01', totalBeforeDiscount: 'NSJ-002', item: 'NFP-002', totalDiscount: '2000', totalAfterDiscount: '100', totalTax: '1900', totalAfterTax: '100',discount: '100' },
+    { id: 3, productCode:'NB003', warehouse: 'warehouse_test', description:'PO-003', principle: 'PT CDE', totalInvoiced: '2022-06-01', totalBeforeDiscount: 'NSJ-003', item: 'NFP-003', totalDiscount: '3000', totalAfterDiscount: '100', totalTax: '2900', totalAfterTax: '100',discount: '100' },
 ]
 
 </script>
