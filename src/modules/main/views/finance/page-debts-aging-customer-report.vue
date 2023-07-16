@@ -54,6 +54,7 @@ const templateData = [
         :filters="filterFields"
         :columns="columns"
         url="debtsAgingReportPerCustomers"
+        custom-route="debts-aging-report-per-customer"
         :template-data="templateData"
     />
 </template>

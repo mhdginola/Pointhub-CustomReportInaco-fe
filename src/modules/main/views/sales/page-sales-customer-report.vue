@@ -55,5 +55,6 @@ const templateData = [
         :columns="columns"
         :template-data="templateData"
         url="salesReportPerCustomers"
+        custom-route="sales-report-per-customer"
     />
 </template>

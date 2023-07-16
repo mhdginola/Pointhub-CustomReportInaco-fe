@@ -71,6 +71,7 @@ const templateData = [
         :filters="filterFields"
         :columns="columns"
         :template-data="templateData"
-        url="purchaseReports"
+        custom-route="purchase-report-details"
+        url="purchaseReportsDetails"
     />
 </template>

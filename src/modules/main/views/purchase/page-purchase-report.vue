@@ -51,7 +51,8 @@ const templateData = [
     <VDatatable 
         :filters="filterFields"
         :columns="columns"
-        url="purchaseReportDetails"
+        url="purchaseReports"
+        custom-route="purchase-report"
         :template-data="templateData"
     />
 </template>

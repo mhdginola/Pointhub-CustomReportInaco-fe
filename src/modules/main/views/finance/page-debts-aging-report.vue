@@ -56,5 +56,6 @@ const templateData =  [
         :columns="columns"
         url="debtsAgingReports"
         :template-data="templateData"
+        custom-route="debts-aging-reports"
     />
 </template>

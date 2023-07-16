@@ -58,9 +58,9 @@ export const routes = {
     },
     {
       meta: {
-        label: 'Finance',
+        label: 'Debts Aging',
       },
-      path: 'finance',
+      path: 'debts-aging',
       children: [
         {
           meta: {

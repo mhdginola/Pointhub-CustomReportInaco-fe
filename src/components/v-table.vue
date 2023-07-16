@@ -153,13 +153,20 @@ const toggleAllSelections = function(){
                 <p class="text-sm text-slate-600 dark:text-slate-400">Showing {{showing.start}} to {{showing.end}} of {{showing.total}} entries</p>
             </div>
             <div class="btn-group">
-                <button @click="gotoPage(null, -1)" type="button" class="previous-page-button btn btn-light-dark">
+                <button @click="gotoPage(1)" type="button" :disable="state.currentPage === 1? 'disabled': ''" class="first-page-button btn btn-light-dark">
+                    <i class="i-ph-caret-double-left"></i>
+                </button>
+                <button @click="gotoPage(null, -1)" :disable="state.currentPage === 1? 'disabled': ''" type="button" class="previous-page-button btn btn-light-dark">
                     <i class="i-ph-caret-left"></i>
                 </button>
                 
                 <button v-for="page in paginations" @click="gotoPage(page)" :key="page" type="button" class="page-number" :class="state.currentPage === page? ' active': ''">{{page}}</button>
-                <button @click="gotoPage(null, 1)" type="button" class="next-page-button btn btn-light-dark">
+                
+                <button @click="gotoPage(null, 1)" :class="state.currentPage === paginations.length? 'disabled': ''" type="button" class="next-page-button btn btn-light-dark">
                     <i class="i-ph-caret-right"></i>
+                </button>
+                <button @click="gotoPage(paginations.length)" :class="state.currentPage === paginations.length? 'disabled': ''" type="button" class="last-page-button btn btn-light-dark">
+                    <i class="i-ph-caret-double-right"></i>
                 </button>
             </div>
         </div>

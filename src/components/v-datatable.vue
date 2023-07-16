@@ -26,7 +26,8 @@ const props = defineProps({
     templateData: {
         type: Array<Object>,
         default: [],
-    }
+    },
+    customRoute: String,
 });
 
 const state = reactive<any>({
@@ -146,10 +147,10 @@ onMounted(() => {
             <div>
                 <button
                     @click="atoms.isPrintModalOpen = true;"
-                    class="btn-print btn-icon">
+                    class="btn-print btn-icon" :class="'print-' + customRoute">
                     <i class="i-ph-printer"></i>
                 </button>
-                <button @click="initDownload()" class="btn-download btn-icon">
+                <button @click="initDownload()" class="btn-download btn-icon" :class="'download-' + customRoute">
                     <i class="i-ph-download"></i>
                 </button>
             </div>
@@ -184,7 +185,7 @@ onMounted(() => {
             size="sm"
         >
             <template #content>
-                <div class="modal-download-progress max-h-90vh overflow-auto p-4">
+                <div class="modal-download-progress max-h-90vh overflow-auto p-4" :class="'modal-download-' + customRoute + '-progress'">
                     <div class="space-y-8 mx-auto text-center">
                         <p>
                             Downloading... please wait
@@ -198,7 +199,7 @@ onMounted(() => {
             size="full"
         >
             <template #content>
-                <div class="modal-print-progress max-h-90vh overflow-auto p-4">
+                <div class="modal-print-progress max-h-90vh overflow-auto p-4" :class="'modal-print-' + customRoute + '-progress'">
                     <h2 class="py-4 text-2xl font-bold">Lorem Ipsum</h2>
                     <div class="space-y-8">
                     <p>

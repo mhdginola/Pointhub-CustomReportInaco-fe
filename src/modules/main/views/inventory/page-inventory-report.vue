@@ -63,5 +63,6 @@ const templateData = [
         :columns="columns"
         url="inventoryReports"
         :template-data="templateData"
+        custom-route="page-inventory-reports"
     />
 </template>
