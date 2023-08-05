@@ -103,7 +103,7 @@ describe('debts aging per customer report',() => {
         expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].debitMemo)
       })
       cy.get('td.cn').each(($td, index)=>{
-        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].remaining)
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].cn)
       })
       cy.get('td.remaining').each(($td, index)=>{
         expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].remaining)
@@ -111,7 +111,7 @@ describe('debts aging per customer report',() => {
     })
     it('show page debt aging customer report, with filter', () => {
       const dateInvoice = '2022-01-01'
-      const customer = 'PT ABC'
+      const customer = 'PTABC'
       const body = {
         debtsAgingReportPerCustomers: [
           { id: 1, customerID: 'wr1', name: customer, invoice: 'in1', invoiceDate: '2023-01-01', description:'PO-001', dpp: 'supplier1', ppn: '2023-01-01', totalInvoice: 'NSJ-001', payment: 'nacme1', debitMemo: '1000', cn: 'nacme1', remaining: '1000' },
@@ -168,14 +168,14 @@ describe('debts aging per customer report',() => {
         expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].debitMemo)
       })
       cy.get('td.cn').each(($td, index)=>{
-        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].remaining)
+        expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].cn)
       })
       cy.get('td.remaining').each(($td, index)=>{
         expect($td.text()).to.equal(body.debtsAgingReportPerCustomers[index].remaining)
       })
     })
     it('show page debt aging customer report, with search', () => {
-      const customerSearch = 'customer test';
+      const customerSearch = 'customertest';
       const body = {
         debtsAgingReportPerCustomers: [
           { id: 1, customerID: 'wr1', name: customerSearch, invoice: 'in1', invoiceDate: '2023-01-01', description:'PO-001', dpp: 'supplier1', ppn: '2023-01-01', totalInvoice: 'NSJ-001', payment: 'nacme1', debitMemo: '1000', cn: 'nacme1', remaining: '1000' },

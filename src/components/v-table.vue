@@ -7,6 +7,7 @@ export type Column = {
     name: string,
     label: string,
     hide?: boolean,
+    type?: string,
 }
 
 export type Datum = Object & {
@@ -46,9 +47,9 @@ const dataLength = computed(()=>{
     return props.total ?? props.data?.length;
 });
 const paginations = computed(()=>{
-    let items = [1];
-    let length = dataLength.value / props.perPage;
-    let i = 2;
+    let items = [];
+    let length = Math.ceil(dataLength.value / props.perPage);
+    let i = 1;
     while(i <= length){
         items.push(i++);
     }
@@ -69,8 +70,8 @@ const slicedData = computed(()=>{
 
 const showing = computed(() => {
 
-    let start = state.currentPage;
-    let end = state.currentPage + props.perPage;
+    let start = (state.currentPage - 1) * props.perPage + 1;
+    let end = (state.currentPage) * props.perPage;
     if(end > dataLength.value){
         end = dataLength.value;
     }
@@ -141,13 +142,22 @@ const toggleAllSelections = function(){
                             {{ (index + 1) + ((state.currentPage - 1) * props.perPage) }}
                         </td>
                         <template v-for="column in columns" :key="column.name">
-                            <td v-if="!column.hide" :class="'basic-table-body ' + column.name">{{ item[column.name] ?? '-' }}</td>
+                            <td v-if="!column.hide" :class="'hidden ' + column.name">{{ item[column.name] ?? '-' }}</td>
+                            <td v-if="!column.hide" :class="'basic-table-body '">
+                                <template v-if="column.type === 'number'">
+                                    {{ Intl.NumberFormat('en-US', {
+                                        
+                                    }).format(item[column.name] ?? '-') }}
+                                </template>
+                                <template v-else>
+                                    {{ item[column.name] ?? '-' }}
+                                </template>
+                            </td>
                         </template>
                     </tr>
                 </tbody>
             </table>
         </div>
-
         <div class="w-full flex items-center justify-between">
             <div>
                 <p class="text-sm text-slate-600 dark:text-slate-400">Showing {{showing.start}} to {{showing.end}} of {{showing.total}} entries</p>
@@ -171,5 +181,4 @@ const toggleAllSelections = function(){
             </div>
         </div>
     </div>
-
 </template>

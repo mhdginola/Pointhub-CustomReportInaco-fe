@@ -5,6 +5,7 @@ const customers = [
     {id: 'NB001', label: 'NB001'},
     {id: 'NB002', label: 'NB002'},
     {id: 'NB003', label: 'NB003'},
+    {id: 'PTABC', label: 'PTABC'},
 ]
 
 export {

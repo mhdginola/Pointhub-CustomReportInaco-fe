@@ -9,11 +9,11 @@ const columns = [
     {name: 'productCode', label: 'Product Code'},
     {name: 'principle', label: 'Customer'},
     {name: 'totalInvoiced', label: 'Total Invoiced'},
-    {name: 'totalBeforeDiscount', label: 'Total Before Discount'},
+    {name: 'totalBeforeDiscount', label: 'Total Before Discount', type: 'number'},
     {name: 'totalDiscount', label: 'Total Discount'},
-    {name: 'totalAfterDiscount', label: 'Total After Discount'},
+    {name: 'totalAfterDiscount', label: 'Total After Discount', type: 'number'},
     {name: 'totalTax', label: 'Total Tax'},
-    {name: 'totalAfterTax', label: 'Total After Tax'},
+    {name: 'totalAfterTax', label: 'Total After Tax', type: 'number'},
 ];
 
 const filterFields = [

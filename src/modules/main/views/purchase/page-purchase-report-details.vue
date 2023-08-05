@@ -13,10 +13,10 @@ const columns = [
     {name: 'itemDescription', label: 'Item Description'},
     {name: 'qtyVoucher', label: 'Qty Voucher'},
     {name: 'materialPriceConversion', label: 'Material Price Conv'},
-    {name: 'discount', label: 'Discount'},
-    {name: 'afterDiscount', label: 'After Discount'},
+    {name: 'discount', label: 'Discount', type: 'number'},
+    {name: 'afterDiscount', label: 'After Discount', type: 'number'},
     {name: 'ppn', label: 'PPN'},
-    {name: 'total', label: 'Total'},
+    {name: 'total', label: 'Total', type: 'number'},
 ];
 
 const filterFields = [

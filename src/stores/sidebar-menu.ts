@@ -137,11 +137,11 @@ const menuMain = {
       submenu: [
         {
           name: 'Debts Aging Report',
-          path: '/finance/debts-aging-report'
+          path: '/debts-aging/debts-aging-report'
         },
         {
           name: 'Debts Aging Report per Customer',
-          path: '/finance/debts-aging-customer-report'
+          path: '/debts-aging/debts-aging-customer-report'
         }
       ]
     },

@@ -14,21 +14,13 @@ const columns = [
     {name: 'payment', label: 'Payment'},
     {name: 'debitMemo', label: 'Debit Memo'},
     {name: 'cn', label: 'CN'},
-    {name: 'remaining', label: 'Remaining'},
+    {name: 'remaining', label: 'Remaining', type: 'number'},
 ];
 
 const filterFields = [
     {
-        label: 'Date From',
-        name: 'dateFrom',
-        type: 'date',
-        component: 'input',
-        options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
-        placeholder: 'YYYY-MM-DD',
-    },
-    {
-        label: 'Date To',
-        name: 'dateTo',
+        label: 'Date',
+        name: 'date',
         type: 'date',
         component: 'input',
         options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
@@ -54,7 +46,7 @@ const templateData = [
         :filters="filterFields"
         :columns="columns"
         url="debtsAgingReportPerCustomers"
-        custom-route="debts-aging-report-per-customer"
+        custom-route="debts-aging-customer-report"
         :template-data="templateData"
     />
 </template>

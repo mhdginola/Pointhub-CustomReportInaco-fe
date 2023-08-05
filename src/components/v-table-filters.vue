@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import {BaseInputMask, BaseSelect, BaseSelectMask} from './';
+import {BaseInputMask, BaseDatepicker, BaseSelectMask} from './';
 
 const props = defineProps({
     fields: Array<any>,
@@ -9,7 +9,12 @@ const props = defineProps({
 const getComponent = function(field: any){
     switch(field.component){
         case 'select': return BaseSelectMask;
-        case 'input': return BaseInputMask;
+        case 'input': {
+            if(field.options?.date){
+                return BaseDatepicker
+            }
+            return BaseInputMask;
+        };
     }
     return 'div';
 }
@@ -35,6 +40,7 @@ const computedStates = computed<any>({
                 :is="getComponent(field)"
                 v-model="computedStates[field.name]"
                 :name="field.name"
+                :type="field.options?.date === true? 'date': field.type ?? 'text'"
                 :label="field.label"
                 v-bind="field"
             />

@@ -9,10 +9,10 @@ const columns = [
     {name: 'quantityInStock', label: 'Qty In Stock'},
     {name: 'receiptsQuantity', label: 'Receipts Quantity'},
     {name: 'issuesQuantity', label: 'Issues Quantity'},
-    {name: 'unitCost', label: 'Unit Cost'},
-    {name: 'startBalanceCost', label: 'Start Balance Cost'},
-    {name: 'receiptsAmount', label: 'Receipts Amount'},
-    {name: 'issuesAmount', label: 'Issues Amount'},
+    {name: 'unitCost', label: 'Unit Cost', type: 'number'},
+    {name: 'startBalanceCost', label: 'Start Balance Cost', type: 'number'},
+    {name: 'receiptsAmount', label: 'Receipts Amount', type: 'number'},
+    {name: 'issuesAmount', label: 'Issues Amount', type: 'number'},
 ];
 
 const filterFields = [

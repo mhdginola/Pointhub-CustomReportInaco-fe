@@ -35,23 +35,11 @@ function toggleDarkMode() {
 
         <!-- Right: Header Buttons -->
         <div class="flex items-center space-x-2">
-          <component :is="ComponentNotification" />
+          <!-- <component :is="ComponentNotification" /> -->
 
-          <component :is="BaseDropdown">
+          <!-- <component :is="BaseDropdown">
             <template #trigger>
-              <div
-                class="relative max-w-75 w-full flex cursor-pointer items-center rounded-lg py-2 pl-3 text-left lg:min-w-50 space-x-2 focus-visible:border-indigo-500 sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-orange-300"
-              >
-                <div class="avatar avatar-xs">
-                  <img class="mask mask-squircle" src="https://via.placeholder.com/150" />
-                </div>
-                <div class="hidden lg:block">
-                  <span class="block">John Doe</span>
-                  <span class="block text-xs">Admin Purchasing</span>
-                </div>
-              </div>
-            </template>
-            <div class="p-1">
+              <div class="p-1">
               <div class="flex items-center gap-2 p-2">
                 <i class="i-far-circle-user block"></i>
                 <span>Profile</span>
@@ -77,7 +65,18 @@ function toggleDarkMode() {
                 <span>Logout</span>
               </div>
             </div>
-          </component>
+          </component> -->
+          <div
+              class="relative max-w-75 w-full flex cursor-pointer items-center rounded-lg py-2 pl-3 text-left lg:min-w-50 space-x-2 focus-visible:border-indigo-500 sm:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-orange-300"
+            >
+            <div class="avatar avatar-xs">
+              <img class="mask mask-squircle" src="https://via.placeholder.com/150" />
+            </div>
+            <div class="hidden lg:block">
+              <span class="block">John Doe</span>
+              <span class="block text-xs">Admin Purchasing</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

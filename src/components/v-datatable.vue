@@ -34,6 +34,12 @@ const state = reactive<any>({
     filters: {},
     searchTerm: '',
     data: [],
+    pagination: {
+        page: 1,
+        pageSize: 10,
+        pageCount: 1,
+        totalDocument: 12,
+    },
 });
 
 const atoms = reactive({
@@ -121,11 +127,17 @@ const search = function(){
     client.search(props.url, {
         filter: state.filters,
         search: state.searchTerm
-    }).then(function({data}: any){
+    }).then(function({data, pagination}: any){
         state.data = data;
+        state.pagination = pagination;
     }).catch(e => {
         // updateSearch();
     });
+}
+
+const updateSearchTerm = function(event: any){
+    state.searchTerm = event.target.value;
+    search();
 }
 
 onMounted(() => {
@@ -162,13 +174,14 @@ onMounted(() => {
                     <div class="flex-grow">
                         <component
                             :is="BaseInputMask"
-                            v-model="state.searchTerm"
+                            :model-value="state.searchTerm"
                             label="Search"
                             name="search"
+                            @change="updateSearchTerm"
                             placeholder="input a search term"
                         ></component>
                     </div>
-                    <button id="search" class="btn-sm btn-primary h-fit mt-auto" @click="search">Apply</button>
+                    <button class="fixed w-2 h-2 z-[10000] top-0 left-0 opacity-0" id="search"></button>
                 </div>
             </div>
         
@@ -177,6 +190,7 @@ onMounted(() => {
                 :columns="props.columns"
                 :data="state.data"
                 :per-page="10"
+                :total="state.pagination.totalDocument"
             />
         
         </div>

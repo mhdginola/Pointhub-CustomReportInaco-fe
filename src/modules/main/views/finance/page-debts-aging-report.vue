@@ -15,7 +15,7 @@ const columns = [
     {name: 'payment', label: 'Payment'},
     {name: 'debitMemo', label: 'Debit Memo'},
     {name: 'cn', label: 'CN'},
-    {name: 'remaining', label: 'Remaining'},
+    {name: 'remaining', label: 'Remaining', type: 'number'},
 ];
 
 const filterFields = [

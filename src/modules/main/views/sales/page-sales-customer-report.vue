@@ -12,7 +12,7 @@ const columns = [
     {name: 'name', label: 'Name'},
     {name: 'dpp', label: 'DPP'},
     {name: 'ppn', label: 'PPN'},
-    {name: 'total', label: 'Total'},
+    {name: 'total', label: 'Total', type: 'number'},
 ];
 
 const filterFields = [
