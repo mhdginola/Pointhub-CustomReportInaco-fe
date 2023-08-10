@@ -41,7 +41,10 @@ interface StateInterface {
 
 export const useSidebarMenuStore = defineStore('sidebar-menu', {
   state: (): StateInterface => ({
-    shortcut: [menuMain, menuTemplate],
+    shortcut: [
+      menuMain,
+      // menuTemplate
+    ],
     activeShortcut: menuMain,
     activeShortcutIndex: 0,
     activeMenuName: ''
@@ -102,10 +105,6 @@ const menuMain = {
   path: '/',
   icon: 'i-fad-house-chimney',
   menu: [
-    {
-      name: 'Dashboard',
-      path: '/dashboard'
-    },
     {
       name: 'Purchase',
       submenu: [

@@ -4,8 +4,12 @@ import { routes as mainRoutes } from '@/modules/main/routes'
 import { routes as templateRoutes } from '@/modules/template/routes'
 
 const routes = [
+  {
+    path: '/login',
+    component: () => import('../modules/main/views/page-login.vue'),
+  },
   mainRoutes,
-  templateRoutes,
+  // templateRoutes,
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',

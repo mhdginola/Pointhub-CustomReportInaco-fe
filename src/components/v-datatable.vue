@@ -38,7 +38,7 @@ const state = reactive<any>({
         page: 1,
         pageSize: 10,
         pageCount: 1,
-        totalDocument: 12,
+        totalDocument: props.templateData.length,
     },
 });
 
@@ -84,7 +84,7 @@ const updateSearch = function(){
             }
             if(state.filters.item){
                 if(t.item){
-                    if(t.item !== state.filters.item){
+                    if(state.filters.item.id &&t.item !== state.filters.item?.id){
                         return false;
                     }
                 }
@@ -92,14 +92,14 @@ const updateSearch = function(){
             if(state.filters.customer){
                 let c = t.name || t.customer;
                 if(c){
-                    if(c !== state.filters.customer){
+                    if(state.filters.customer.id &&c !== state.filters.customer?.id){
                         return false;
                     }
                 }
             }
             if(state.filters.warehouse){
                 if(t.warehouse){
-                    if(t.warehouse !== state.filters.warehouse){
+                    if(state.filters.warehouse.id && t.warehouse !== state.filters.warehouse?.id){
                         return false;
                     }
                 }
@@ -120,12 +120,22 @@ const updateSearch = function(){
         }
         return true;
     });
+    state.pagination.totalDocument = state.data.length;
+}
+
+const serializeFilter = function(filters: any){
+    return Object.keys(filters).reduce((p: any, key: any) => {
+        return {
+            ...p,
+            [key]: typeof filters[key] === 'object'? filters[key].id: filters[key]
+        }
+    }, {});
 }
 
 const search = function(){
     updateSearch();
     client.search(props.url, {
-        filter: state.filters,
+        filter: serializeFilter(state.filters),
         search: state.searchTerm
     }).then(function({data, pagination}: any){
         state.data = data;
