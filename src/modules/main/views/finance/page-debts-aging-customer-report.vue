@@ -28,7 +28,7 @@ const filterFields = [
     },
     {
         label: 'Customer',
-        name: 'customer',
+        name: 'customer_id',
         component: 'select',
         options: customers,
         placeholder: 'Choose One',
@@ -45,7 +45,7 @@ const templateData = [
     <VDatatable 
         :filters="filterFields"
         :columns="columns"
-        url="debtsAgingReportPerCustomers"
+        url="receivables"
         custom-route="debts-aging-customer-report"
         :template-data="templateData"
     />

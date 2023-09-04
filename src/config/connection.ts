@@ -15,7 +15,7 @@ client.search = function(url: string, params: Object = {}){
     return new Promise((resolve, reject) => {
         client().get(`/${url}${serialized? '?' + serialized: ''}`).then(r => {
             resolve({
-                data: r.data[url],
+                data: r.data.data,
                 pagination: r.data.pagination
             });
         }, e => {

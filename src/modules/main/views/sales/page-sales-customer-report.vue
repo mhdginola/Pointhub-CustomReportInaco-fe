@@ -34,7 +34,7 @@ const filterFields = [
     },
     {
         label: 'Customer',
-        name: 'customer',
+        name: 'customer_id',
         component: 'select',
         options: customers,
         placeholder: 'Choose One',
@@ -54,7 +54,7 @@ const templateData = [
         :filters="filterFields"
         :columns="columns"
         :template-data="templateData"
-        url="salesReportPerCustomers"
+        url="sales-report"
         custom-route="sales-report-per-customer"
     />
 </template>
