@@ -74,7 +74,7 @@ function toggleDarkMode() {
             </div>
             <div class="hidden lg:block">
               <span class="block">John Doe</span>
-              <span class="block text-xs">Admin Purchasing</span>
+              <span class="block text-xs">Admin Purchasing</span> 
             </div>
           </div>
         </div>
