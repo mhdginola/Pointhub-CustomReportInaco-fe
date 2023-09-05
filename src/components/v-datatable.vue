@@ -134,8 +134,10 @@ const serializeFilter = function(filters: any){
 
 const search = function(){
     updateSearch();
+    console.log(serializeFilter(state.filters));
     client.search(props.url, {
-        filter: serializeFilter(state.filters),
+        // filter: serializeFilter(state.filters),
+        ...serializeFilter(state.filters),
         search: state.searchTerm
     }).then(function({data, pagination}: any){
         state.data = data;

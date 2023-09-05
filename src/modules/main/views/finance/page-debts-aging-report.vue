@@ -37,7 +37,7 @@ const filterFields = [
     },
     {
         label: 'Customer',
-        name: 'customer',
+        name: 'customer_id',
         component: 'select',
         options: customers,
         placeholder: 'Choose One',
@@ -54,7 +54,7 @@ const templateData =  [
     <VDatatable 
         :filters="filterFields"
         :columns="columns"
-        url="debtsAgingReports"
+        url="receivables"
         :template-data="templateData"
         custom-route="debts-aging-reports"
     />
