@@ -1,10 +1,4 @@
 import axios from 'axios';
-import https from 'https';
-
-const agent = new https.Agent({
-    rejectUnauthorized: false,
-    minVersion: 'TLSv1',
-  });
 
 export const client = function(){
     return axios.create({
@@ -12,7 +6,6 @@ export const client = function(){
         headers: {
             Authorization: 'Bearer ' + localStorage.getItem('auth-token'),
         },
-        httpsAgent: agent
     });
 }
 
