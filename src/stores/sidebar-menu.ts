@@ -144,15 +144,15 @@ const menuMain = {
         }
       ]
     },
-    {
-      name: 'Inventory',
-      submenu: [
-        {
-          name: 'Inventory Report',
-          path: '/inventory/inventory-report'
-        },
-      ]
-    }
+    // {
+    //   name: 'Inventory',
+    //   submenu: [
+    //     {
+    //       name: 'Inventory Report',
+    //       path: '/inventory/inventory-report'
+    //     },
+    //   ]
+    // }
   ]
 }
 
