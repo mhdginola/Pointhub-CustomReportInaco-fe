@@ -5,7 +5,6 @@ import axios from 'axios';
 //     rejectUnauthorized: false,
 //     minVersion: 'TLSv1',
 //   });
-
 export const client = function(){
     return axios.create({
         baseURL: `${import.meta.env.VITE_BASE_API_URL}`,
