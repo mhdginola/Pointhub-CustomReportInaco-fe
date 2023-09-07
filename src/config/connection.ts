@@ -5,6 +5,7 @@ export const client = function(){
         baseURL: `${import.meta.env.VITE_BASE_API_URL}`,
         headers: {
             Authorization: 'Bearer ' + localStorage.getItem('auth-token'),
+            'ngrok-skip-browser-warning':true
         },
     });
 }
