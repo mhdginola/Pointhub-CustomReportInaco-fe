@@ -6,6 +6,7 @@ import { BaseCheckbox } from '.';
 export type Column = {
     name: string,
     label: string,
+    func?: Function,
     hide?: boolean,
     type?: string,
 }
@@ -22,6 +23,7 @@ type CurrentState = {
     totalData: number,
 };
 
+const emit = defineEmits(['change:page']);
 const props = defineProps({
     columns: Array<Column>,
     selectable: {
@@ -40,20 +42,61 @@ const props = defineProps({
     rowNumber: {
         type: Boolean,
         default: false
+    },
+    isAjax: {
+        type: Boolean,
+        default: true
     }
 })
 
 const dataLength = computed(()=>{
     return props.total ?? props.data?.length;
 });
-const paginations = computed(()=>{
-    let items = [];
-    let length = Math.ceil(dataLength.value / props.perPage);
-    let i = 1;
-    while(i <= length){
-        items.push(i++);
+const paginations = computed(() => {
+  let items = [];
+  let length = Math.ceil(dataLength.value / props.perPage);
+  let currentPage = state.currentPage;
+  
+  const maxVisiblePages = 5; // Adjust this value to control how many pages are visible
+  
+  if (length <= maxVisiblePages) {
+    // If there are fewer pages than the maximum visible pages, show all pages
+    for (let i = 1; i <= length; i++) {
+      items.push(i);
     }
-    return items;
+  } else {
+    // If there are more pages than the maximum visible pages, show a truncated pagination
+    if (currentPage <= Math.ceil(maxVisiblePages / 2)) {
+      // Show the first (maxVisiblePages - 2) pages and add an ellipsis
+      for (let i = 1; i <= maxVisiblePages - 2; i++) {
+        items.push(i);
+      }
+      if(currentPage === 3 &&length > 5){
+        items.splice(0, 1)
+        items.push(4);
+      }
+      items.push("...");
+      items.push(length);
+    } else if (currentPage >= length - Math.floor(maxVisiblePages / 2)) {
+      // Show the last (maxVisiblePages - 2) pages and add an ellipsis
+      items.push(1);
+      items.push("...");
+      for (let i = length - maxVisiblePages + 3; i <= length; i++) {
+        items.push(i);
+      }
+    } else {
+      // Show pages around the current page with ellipses on both sides
+      items.push(1);
+      items.push("...");
+      for (let i = currentPage - Math.floor(maxVisiblePages / 2) + 1; i <= currentPage + Math.floor(maxVisiblePages / 2) - 1; i++) {
+        items.push(i);
+      }
+      items.push("...");
+      items.push(length);
+    }
+  }
+
+  return items;
 });
 
 const state = reactive<CurrentState>({
@@ -65,6 +108,9 @@ const state = reactive<CurrentState>({
 
 const slicedData = computed(()=>{
     let curr = state.currentPage - 1;
+    if(props.isAjax){
+        return props.data;
+    }
     return (props.data ?? []).slice(curr * props.perPage, (curr + 1) * props.perPage);
 });
 
@@ -94,6 +140,11 @@ const gotoPage = function(page: Number|null = null, increment: Number|null = nul
         if(target >= 1 && target <= paginations.value.length){
             state.currentPage = target;
         }
+    }
+    if(props.isAjax){
+        emit('change:page', {
+            page: page,
+        });
     }
 }
 
@@ -147,10 +198,10 @@ const toggleAllSelections = function(){
                                 <template v-if="column.type === 'number'">
                                     {{ Intl.NumberFormat('en-US', {
                                         
-                                    }).format(item[column.name] ?? '-') }}
+                                    }).format(Math.round(parseFloat(column.func? column.func(item): item[column.name] ?? 0) * 1000) / 1000) }}
                                 </template>
                                 <template v-else>
-                                    {{ item[column.name] ?? '-' }}
+                                    {{ column.func? column.func(item): item[column.name] ?? '-'}}
                                 </template>
                             </td>
                         </template>
@@ -170,7 +221,7 @@ const toggleAllSelections = function(){
                     <i class="i-ph-caret-left"></i>
                 </button>
                 
-                <button v-for="page in paginations" @click="gotoPage(page)" :key="page" type="button" class="page-number" :class="state.currentPage === page? ' active': ''">{{page}}</button>
+                <button v-for="page in paginations" @click="typeof page === 'number'? gotoPage(page): ''" :key="page" type="button" class="page-number" :class="state.currentPage === page? ' active': ''">{{page}}</button>
                 
                 <button @click="gotoPage(null, 1)" :class="state.currentPage === paginations.length? 'disabled': ''" type="button" class="next-page-button btn btn-light-dark">
                     <i class="i-ph-caret-right"></i>

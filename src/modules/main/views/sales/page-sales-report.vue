@@ -4,16 +4,16 @@ import { warehouses, items } from '@/data/index';
 
 const columns = [
     {name: 'warehouse', label: 'Warehouse'},
-    {name: 'item', label: 'Item'},
-    {name: 'description', label: 'Description'},
-    {name: 'productCode', label: 'Product Code'},
-    {name: 'principle', label: 'Customer'},
-    {name: 'totalInvoiced', label: 'Total Invoiced'},
-    {name: 'totalBeforeDiscount', label: 'Total Before Discount', type: 'number'},
-    {name: 'totalDiscount', label: 'Total Discount'},
-    {name: 'totalAfterDiscount', label: 'Total After Discount', type: 'number'},
-    {name: 'totalTax', label: 'Total Tax'},
-    {name: 'totalAfterTax', label: 'Total After Tax', type: 'number'},
+    {name: 'item', func: (d: any) => d.items?.map?.((c: any) => c.code).join(', ') || '-',label: 'Item'},
+    {name: 'description', func: (d: any) => d.items?.map?.((c: any) => c.name).join(', ') || '-', label: 'Description'},
+    {name: 'invoiceNumber', label: 'Invoice Number'},
+    {name: 'customerName', func: (d: any) => d.customer?.name, label: 'Customer'},
+    {name: 'total', label: 'Total Invoiced', type: 'number'},
+    {name: 'totalBeforeDiscount', func: (d: any) => d.items?.reduce?.((p: number, c: any) => p + c.price, 0), label: 'Total Before Discount', type: 'number'},
+    {name: 'totalDiscount', func: (d: any) => d.items?.reduce?.((p: number, c: any) => p + c.discount, 0), label: 'Total Discount'},
+    {name: 'totalAfterDiscount', func: (d: any) => d.items?.reduce?.((p: number, c: any) => p + c.subtotal, 0),label: 'Total After Discount', type: 'number'},
+    {name: 'tax', label: 'Total Tax', type: 'number'},
+    {name: 'taxBase', label: 'Total After Tax', type: 'number'},
 ];
 
 const filterFields = [

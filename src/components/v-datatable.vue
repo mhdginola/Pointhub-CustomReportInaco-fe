@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { BaseInputMask, BaseModal, VTable, VTableFilters } from '@/components';
 import { client } from '@/config';
 import { Datum } from './v-table.vue';
 
-type Column = {
+type Column = any | {
     name: string,
     label: string,
     hide?: boolean,
+    func?: Function
 }
+
+const page = ref<any>(1);
 
 const props = defineProps({
     filters: {
@@ -59,6 +62,11 @@ const compareDate = function(date1: string, date2: string){
     let d2 = new Date(date2);
 
     return d1.getTime() >= d2.getTime();
+}
+
+const changePage = function({page: newPage}: any){
+    page.value = newPage
+    search();
 }
 
 const updateSearch = function(){
@@ -125,6 +133,13 @@ const updateSearch = function(){
 
 const serializeFilter = function(filters: any){
     return Object.keys(filters).reduce((p: any, key: any) => {
+        if(props.filters.some((f: any) => f.type === 'date' && key === f.name)){
+            return {
+                ...p,
+                [key]: filters[key].split('-').reverse().join('-')
+            }
+        }
+            
         return {
             ...p,
             [key]: typeof filters[key] === 'object'? filters[key].id: filters[key]
@@ -133,11 +148,12 @@ const serializeFilter = function(filters: any){
 }
 
 const search = function(){
-    updateSearch();
-    console.log(serializeFilter(state.filters));
+    // updateSearch();
+    // console.log(serializeFilter(state.filters));
     client.search(props.url, {
         // filter: serializeFilter(state.filters),
         ...serializeFilter(state.filters),
+        page: page.value,
         search: state.searchTerm
     }).then(function({data, pagination}: any){
         state.data = data;
@@ -198,6 +214,7 @@ onMounted(() => {
             </div>
         
             <VTable
+                @change:page="changePage"
                 :rowNumber="true"
                 :columns="props.columns"
                 :data="state.data"

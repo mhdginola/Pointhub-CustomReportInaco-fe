@@ -3,18 +3,19 @@ import { VDatatable } from '@/components';
 import { customers } from '@/data/index';
 
 const columns = [
-    {name: 'productCode', label: 'Product Code'},
-    {name: 'name', label: 'Name'},
-    {name: 'subTotalPerPrinciple', label: 'Sub Total Per Principle'},
+    {name: 'productCode', label: 'Product Code', func: (d: any) => d.item?.code || '-'},
+    {name: 'name', label: 'Name', func: (d: any) => d.item?.name || '-'},
+    {name: 'subTotalPerPrinciple', label: 'Sub Total Per Principle', func: (d: any) => d.price || 0, type: 'number'},
     {name: 'invoiceNumber', label: 'Invoice'},
-    {name: 'invoiceDate', label: 'Invoice Date'},
+    {name: 'date', label: 'Invoice Date'},
     {name: 'description', label: 'Description'},
     {name: 'dpp', label: 'DPP'},
-    {name: 'ppn', label: 'PPN'},
-    {name: 'invoiceAmount', label: 'Total Invoice'},
-    {name: 'payment', label: 'Payment'},
-    {name: 'debitMemo', label: 'Debit Memo'},
-    {name: 'cn', label: 'CN'},
+    {name: 'tax', label: 'PPN', type: 'number'},
+    {name: 'quantity', label: 'Quantity', type: 'number'},
+    {name: 'total', label: 'Total Invoice', type: 'number'},
+    {name: 'payment', label: 'Payment', func: (d: any) => d.payment?.paid ?? 0, type: 'number'},
+    // {name: 'debitMemo', label: 'Debit Memo'},
+    // {name: 'cn', label: 'CN'},
     {name: 'remaining', label: 'Remaining', type: 'number'},
 ];
 
