@@ -226,7 +226,7 @@ const toggleAllSelections = function(){
                 <button @click="gotoPage(null, 1)" :class="state.currentPage === paginations.length? 'disabled': ''" type="button" class="next-page-button btn btn-light-dark">
                     <i class="i-ph-caret-right"></i>
                 </button>
-                <button @click="gotoPage(paginations.length)" :class="state.currentPage === paginations.length? 'disabled': ''" type="button" class="last-page-button btn btn-light-dark">
+                <button @click="gotoPage(paginations[paginations.length - 1] as number ?? 1)" :class="state.currentPage === paginations.length? 'disabled': ''" type="button" class="last-page-button btn btn-light-dark">
                     <i class="i-ph-caret-double-right"></i>
                 </button>
             </div>
