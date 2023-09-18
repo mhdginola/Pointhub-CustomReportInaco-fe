@@ -173,7 +173,7 @@ onMounted(() => {
         // @ts-ignore
         if(!state.filters[filter.name]){
             // @ts-ignore
-            state.filters[filter.name] = '';
+            state.filters[filter.name] = filter.defaultValue ?? '';
         }
     }
     // @ts-ignore

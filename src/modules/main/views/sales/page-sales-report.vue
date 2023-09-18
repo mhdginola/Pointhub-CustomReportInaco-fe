@@ -22,6 +22,7 @@ const filterFields = [
         name: 'dateFrom',
         type: 'date',
         component: 'input',
+        defaultValue: '2023-05-01',
         options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
         placeholder: 'YYYY-MM-DD',
     },

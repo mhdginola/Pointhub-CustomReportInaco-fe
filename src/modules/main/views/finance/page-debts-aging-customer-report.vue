@@ -39,6 +39,7 @@ const filterFields = [
         component: 'input',
         options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
         placeholder: 'YYYY-MM-DD',
+        defaultValue: '2023-05-01',
     },
     {
         label: 'Customer',
