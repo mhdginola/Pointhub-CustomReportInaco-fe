@@ -4,7 +4,7 @@ import { suppliers, warehouses, items } from '@/data/index';
 
 const columns = [
     {name: 'warehouse', label: 'Warehouse', func: (d: any) => d.warehouse?.code ?? '-'},
-    {name: 'purchaseOrderNumber', label: 'Purchase Order Num', func: (d: any) => d.purchaseOrderNumber ?? '-'},
+    {name: 'purchaseOrderNumber', label: 'Purchase Order Num', func: (d: any) => d.purchaseOrder?.number ?? '-'},
     {name: 'supplier', label: 'Vendor No.', func: (d: any) => d.supplier?.code},
     {name: 'supplierDescription', label: 'Vendor Name', func: (d: any) => d.supplier?.name},
     {name: 'date', label: 'Create Date'},
@@ -12,11 +12,13 @@ const columns = [
     {name: 'item', label: 'Item', func: (d: any) => d.item.code},
     {name: 'itemDescription', label: 'Item Description', func: (d: any) => d.item.name},
     {name: 'quantity', label: 'Qty Voucher'},
-    {name: 'price', label: 'Material Price'},
+    {name: 'units', label: 'Uom Quantity', func: (d: any) => d.unit ?? 'PCS'},
+    {name: 'price', label: 'Material Price', type: 'number'},
     {name: 'p', label: 'Material Price Conv', func: (d: any) => (parseFloat(d.price) * parseFloat(d.quantity)), type: 'number'},
+    {name: 'totalBeforeDiscount', label: 'Total Before Discount', type: 'number', func: (d: any) => Math.round(parseFloat(d.price) * parseFloat(d.quantity) * 1000) / 1000},
     {name: 'discount', label: 'Discount', type: 'number', func:(d: any) =>  Math.round(parseFloat(d.discount) * 1000) / 1000},
-    {name: 'afterDiscount', label: 'After Discount', type: 'number', func: (d: any) => d.total && d.tax? Math.round(parseFloat(d.total) - parseFloat(d.tax) * 1000) / 1000: 0},
-    {name: 'tax', label: 'PPN', func:(d: any) =>  d.tax? Math.round(parseFloat(d.tax) * 1000) / 1000: 0},
+    {name: 'afterDiscount', label: 'Total After Discount', type: 'number', func: (d: any) => d.total && d.tax? Math.round((parseFloat(d.total) - parseFloat(d.tax)) * 1000) / 1000: 0},
+    {name: 'tax', label: 'PPN', type: 'number', func:(d: any) =>  d.tax? Math.round(parseFloat(d.tax) * 1000) / 1000: 0},
     {name: 'total', label: 'Total', type: 'number', func:(d: any) =>  d.total? Math.round(parseFloat(d.total) * 1000) / 1000: 0},
 ];
 
