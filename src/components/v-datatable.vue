@@ -177,7 +177,7 @@ onMounted(() => {
         }
     }
     // @ts-ignore
-    state.data = props.templateData;
+    // state.data = props.templateData;
     search();
 });
 </script>

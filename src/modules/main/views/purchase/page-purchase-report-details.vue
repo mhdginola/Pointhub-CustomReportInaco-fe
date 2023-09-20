@@ -3,20 +3,21 @@ import { VDatatable } from '@/components';
 import { suppliers, warehouses, items } from '@/data/index';
 
 const columns = [
-    {name: 'warehouse', label: 'Warehouse', func: (d: any) => d.warehouse.code ?? '-'},
+    {name: 'warehouse', label: 'Warehouse', func: (d: any) => d.warehouse?.code ?? '-'},
     {name: 'purchaseOrderNumber', label: 'Purchase Order Num', func: (d: any) => d.purchaseOrderNumber ?? '-'},
-    {name: 'supplier', label: 'Vendor No.', func: (d: any) => d.supplier.code},
-    {name: 'supplierDescription', label: 'Vendor Name', func: (d: any) => d.supplier.name},
+    {name: 'supplier', label: 'Vendor No.', func: (d: any) => d.supplier?.code},
+    {name: 'supplierDescription', label: 'Vendor Name', func: (d: any) => d.supplier?.name},
     {name: 'date', label: 'Create Date'},
     {name: 'invoiceNumber', label: 'No. Invoice'},
     {name: 'item', label: 'Item', func: (d: any) => d.item.code},
     {name: 'itemDescription', label: 'Item Description', func: (d: any) => d.item.name},
     {name: 'quantity', label: 'Qty Voucher'},
-    {name: 'price', label: 'Material Price Conv'},
+    {name: 'price', label: 'Material Price'},
+    {name: 'p', label: 'Material Price Conv', func: (d: any) => (parseFloat(d.price) * parseFloat(d.quantity)), type: 'number'},
     {name: 'discount', label: 'Discount', type: 'number', func:(d: any) =>  Math.round(parseFloat(d.discount) * 1000) / 1000},
-    {name: 'afterDiscount', label: 'After Discount', type: 'number', func: (d: any) => Math.round(parseFloat(d.total) - parseFloat(d.tax) * 1000) / 1000},
-    {name: 'tax', label: 'PPN', func:(d: any) =>  Math.round(parseFloat(d.tax) * 1000) / 1000},
-    {name: 'total', label: 'Total', type: 'number', func:(d: any) =>  Math.round(parseFloat(d.total) * 1000) / 1000},
+    {name: 'afterDiscount', label: 'After Discount', type: 'number', func: (d: any) => d.total && d.tax? Math.round(parseFloat(d.total) - parseFloat(d.tax) * 1000) / 1000: 0},
+    {name: 'tax', label: 'PPN', func:(d: any) =>  d.tax? Math.round(parseFloat(d.tax) * 1000) / 1000: 0},
+    {name: 'total', label: 'Total', type: 'number', func:(d: any) =>  d.total? Math.round(parseFloat(d.total) * 1000) / 1000: 0},
 ];
 
 const filterFields = [
