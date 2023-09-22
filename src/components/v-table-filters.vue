@@ -43,7 +43,7 @@ const bindField = function(field: any){
 <template>
     <div class="card card-template">
         <h3>Filters</h3>
-        <div class="flex flex-row gap-4 items-end">
+        <div class="flex flex-col md:flex-row gap-4 md:items-end">
             <component v-model="computedStates[field.name]"
                 v-for="field in fields"
                 :key="field.name"

@@ -209,7 +209,7 @@ const toggleAllSelections = function(){
                 </tbody>
             </table>
         </div>
-        <div class="w-full flex items-center justify-between">
+        <div class="w-full md:flex-row flex-col gap-y-4 flex items-center justify-between">
             <div>
                 <p class="text-sm text-slate-600 dark:text-slate-400">Showing {{showing.start}} to {{showing.end}} of {{showing.total}} entries</p>
             </div>
