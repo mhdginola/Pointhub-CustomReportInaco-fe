@@ -8,7 +8,7 @@ const columns = [
     // {name: 'invoiceNumber', label: 'Purchase Invoice'},
     {name: 'supplier', label: 'Supplier', func: (d: any)=>d.supplier?.name},
     // {name: 'invoiceNumber', label: 'No. Faktur'},
-    {name: 'noSuratJalan', label: 'No. Surat Jalan'},
+    {name: 'noSuratJalan', label: 'No. Surat Jalan', func: (d: any) => d.purchaseReceive?.number ?? '-'},
     {name: 'noFakturPajak', label: 'No. Faktur Pajak'},
     {name: 'taxBase', label: 'DPP', type: 'number', func: (d: any) => Math.round(parseFloat(d.taxBase) * 1000) / 1000},
     {name: 'tax', label: 'PPN', type: 'number', func: (d: any) => Math.round(parseFloat(d.tax) * 1000) / 1000},
