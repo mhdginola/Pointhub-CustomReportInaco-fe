@@ -27,5 +27,5 @@
 }
 
 button[class$="-page-button"] i {
-    @apply hover:opacity-80 dark:text-white text-white h-12px w-12px flex items-center justify-center;
+    @apply hover:opacity-80 dark:text-white h-12px w-12px flex items-center justify-center;
 }
