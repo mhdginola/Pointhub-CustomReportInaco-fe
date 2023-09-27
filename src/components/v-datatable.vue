@@ -31,6 +31,14 @@ const props = defineProps({
         default: [],
     },
     customRoute: String,
+    defaultRowSpanFunc: {
+        type: Function,
+        default: () => 1,
+    },
+    subRowKey: {
+        type: String,
+        default: null
+    }
 });
 
 const state = reactive<any>({
@@ -215,6 +223,8 @@ onMounted(() => {
         
             <VTable
                 @change:page="changePage"
+                :sub-row-key="props.subRowKey"
+                :defaultRowSpanFunc="props.defaultRowSpanFunc"
                 :rowNumber="true"
                 :columns="props.columns"
                 :data="state.data"

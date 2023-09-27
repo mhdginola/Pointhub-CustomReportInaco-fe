@@ -2,22 +2,40 @@
 import { VDatatable } from '@/components';
 import { warehouses, items } from '@/data/index';
 
+const getItemGroup = function(item: any, index: number){
+    return (item.items ?? []).filter((subData: any) => subData.group === (item.items ?? [])[index]?.group)
+}
+const getItemRowSpan = function(item: any, index: number){
+    let actualIndex = (item.items ?? []).findIndex((f: any) => f?.group === (item.items)[index]?.group);
+    const totalIndices = getItemGroup(item, index)?.length;
+    return actualIndex === index? totalIndices: 0;
+}
+
+const getItemTotalPerPrincipal = function(item: any, actualItem: any, index: number){
+    const itemGroup = getItemGroup(actualItem, index);
+    return itemGroup.reduce((p: any, c: any) => p + ((c.price  - c.discount) * c.quantity), 0)
+}
+
 const columns = [
-    {name: 'warehouse', label: 'Warehouse'},
-    {name: 'item', func: (d: any) => d.items?.map?.((c: any) => c.code).join(', ') || '-',label: 'Item'},
-    {name: 'description', func: (d: any) => d.items?.map?.((c: any) => c.name).join(', ') || '-', label: 'Description'},
+    {name: 'warehouse', label: 'Warehouse', func: (d: any) => d.warehouse.name},
     {name: 'invoiceNumber', label: 'Invoice Number'},
     {name: 'customerName', func: (d: any) => d.customer?.name, label: 'Customer'},
-    {name: 'productCode', label: 'Product Code'},
-    {name: 'uomQty', label: 'Uom Quantity'},
-    {name: 'pricePerQty', label: 'Price Per Quantity', type: 'number'},
-    {name: 'totalPerPrincipal', label: 'Total Per Principal', type: 'number'},
-    {name: 'total', label: 'Total Invoiced', type: 'number'},
-    {name: 'totalBeforeDiscount', func: (d: any) => d.items?.reduce?.((p: number, c: any) => p + c.price, 0), label: 'Total Before Discount', type: 'number'},
-    {name: 'totalDiscount', func: (d: any) => d.items?.reduce?.((p: number, c: any) => p + c.discount, 0), label: 'Total Discount', type: 'number'},
-    {name: 'totalAfterDiscount', func: (d: any) => d.items?.reduce?.((p: number, c: any) => p + c.subtotal, 0),label: 'Total After Discount', type: 'number'},
+    {name: 'productCode', label: 'Product Code', subRow: true, subFunc: (d: any) => d.group, rowSpanFunc: (item: any, index: number) => getItemRowSpan(item, index)},
+    {name: 'item', subRow: true, subFunc: (d: any) => d.code, label: 'Item', rowSpanFunc: () => 1},
+    {name: 'description', subRow: true, subFunc: (d: any) => d.name, label: 'Description', rowSpanFunc: () => 1},
+    {name: 'quantity', label: 'Total Invoiced', subRow: true, subFunc: (d: any) => d.quantity, type: 'number'},
+    {name: 'uomQty', label: 'Uom Quantity', subRow: true, subFunc: (d: any) => d.unit},
+    {name: 'pricePerQty', label: 'Price', type: 'number', subRow: true, subFunc: (d: any) => d.price},
+    {name: 'totalBeforeDiscount', subRow: true, subFunc: (d: any) => d.subtotal, label: 'Total Before Discount', type: 'number'},
+    {name: 'discount', label: 'Total Discount', type: 'number', subRow: true, subFunc: (d: any) => d.discount},
+    {name: 'totalAfterDiscount', subRow: true, subFunc: (d: any) => ((d.price  - d.discount) * d.quantity), label: 'Total After Discount', type: 'number'},
+    {name: 'totalPerPrincipal', subRow: true, subFunc: getItemTotalPerPrincipal, rowSpanFunc: (item: any, index: number) => getItemRowSpan(item, index), label: 'Total Per Principal', type: 'number'},
+    {name: 'totalBeforeDiscountByInvoice', func: (d: any) => d.items?.reduce?.((p: number, c: any) => p + (c.price - c.discount) * c.quantity, 0), label: 'Total Before Discount by Invoice', type: 'number'},
+    {name: 'totalDiscountByInvoice', func: (d: any) => d.discount, label: 'Total Before Discount by Invoice', type: 'number'},
+    {name: 'taxBase', label: 'Total After Discount by Invoice', type: 'number'},
+    // {name: 'totalAfterDiscount', func: (d: any) => d.items?.reduce?.((p: number, c: any) => p + c.subtotal, 0),label: 'Total After Discount', type: 'number'},
     {name: 'tax', label: 'Total Tax', type: 'number'},
-    {name: 'taxBase', label: 'Total After Tax', type: 'number'},
+    {name: 'total', label: 'Total After Tax', type: 'number'},
 ];
 
 const filterFields = [
@@ -63,9 +81,11 @@ const templateData = [
 </script>
 <template>
     <VDatatable 
+        :defaultRowSpanFunc="(data: any) => data?.items?.length ?? 1"
         :filters="filterFields"
         :columns="columns"
         :template-data="templateData"
+        subRowKey="items"
         url="sales-recap-report"
         custom-route="sales-report"
     />

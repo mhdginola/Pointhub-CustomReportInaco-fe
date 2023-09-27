@@ -9,6 +9,9 @@ export type Column = {
     func?: Function,
     hide?: boolean,
     type?: string,
+    rowSpanFunc?: Function,
+    subRow?: boolean
+    subFunc?: Function
 }
 
 export type Datum = Object & {
@@ -46,6 +49,14 @@ const props = defineProps({
     isAjax: {
         type: Boolean,
         default: true
+    },
+    defaultRowSpanFunc: {
+        type: Function,
+        default: () => 1
+    },
+    subRowKey: {
+        type: String,
+        default: null
     }
 })
 
@@ -163,6 +174,22 @@ const toggleAllSelections = function(){
         state.selectedRows = props.data?.map(d => d.id) ?? [];
     }
 }
+
+const rowSpan = function(column: any, data: any = null){
+    if(column === 'default'){
+        return props.defaultRowSpanFunc?.(data) ?? 1;
+    }
+    if(column === 'index'){
+        return props.defaultRowSpanFunc?.(data) ?? 1;
+    }
+
+    return column?.rowSpanFunc?.(data) ?? props.defaultRowSpanFunc?.(data) ?? 1;
+}
+
+
+// const extractRowSpanItems = function(index, column){
+//     return slicedData[]
+// }
 </script>
 
 <template>
@@ -185,16 +212,17 @@ const toggleAllSelections = function(){
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(item, index) in slicedData" :key="item.id ?? index" class="basic-table-row">
-                        <td v-if="selectable" class="basic-table-head text-center">
+                    <template v-for="(item, index) in slicedData" :key="item.id ?? index">
+                        <tr class="basic-table-row">
+                            <td v-if="selectable" :rowSpan="rowSpan('default', item)" class="basic-table-head text-center">
                             <BaseCheckbox theme="info" :model-value="state.selectedRows.includes(item.id)" @update:model-value="selectRow(item.id)" />
                         </td>
-                        <td v-if="rowNumber" class="no basic-table-body">
+                        <td v-if="rowNumber" :rowSpan="rowSpan('index', item)" class="no basic-table-body">
                             {{ (index + 1) + ((state.currentPage - 1) * props.perPage) }}
                         </td>
                         <template v-for="column in columns" :key="column.name">
-                            <td v-if="!column.hide" :class="'hidden ' + column.name">{{ item[column.name] ?? '-' }}</td>
-                            <td v-if="!column.hide" :class="'basic-table-body '">
+                            <td v-if="!column.hide" :rowSpan="rowSpan(column, item)" :class="'hidden ' + column.name">{{ item[column.name] ?? '-' }}</td>
+                            <td v-if="!column.hide && !column.subRow" :rowSpan="rowSpan(column, item)" class="basic-table-body">        
                                 <template v-if="column.type === 'number'">
                                     {{ Intl.NumberFormat('en-US', {
                                         
@@ -204,29 +232,56 @@ const toggleAllSelections = function(){
                                     {{ column.func? column.func(item): item[column.name] ?? '-'}}
                                 </template>
                             </td>
+                            <td v-if="!column.hide && column.subRow && ((column.rowSpanFunc?.(item, 0) ?? 1) !== 0)" :rowSpan="column.rowSpanFunc?.(item, 0) ?? 1" class="basic-table-body">
+                                <template v-if="column.type === 'number'">
+                                    {{ Intl.NumberFormat('en-US', {
+                                        
+                                    }).format(Math.round(parseFloat(column.subFunc? column.subFunc(item[props.subRowKey]?.[0], item, 0): item[column.name] ?? 0) * 1000) / 1000) }}
+                                </template>
+                                <template v-else>
+                                    {{ column.subFunc? column.subFunc(item[props.subRowKey]?.[0], item): item[column.name] ?? '-'}}
+                                </template>
+                            </td>
                         </template>
-                    </tr>
+                        </tr>
+                        <template v-if="props.subRowKey">
+                            <tr class="basic-table-row" v-for="(data, index) in item[props.subRowKey]?.slice(1)" :key="index">
+                                <template v-for="column in columns" :key="column.name">
+                                    <td v-if="!column.hide && column.subRow && ((column.rowSpanFunc?.(item, index + 1) ?? 1) !== 0)" :rowSpan="column.rowSpanFunc?.(item, index + 1) ?? 1" :class="'basic-table-body '">        
+                                        <template v-if="column.type === 'number'">
+                                            {{ Intl.NumberFormat('en-US', {
+                                                
+                                            }).format(Math.round(parseFloat(column.subFunc? column.subFunc(data, item, index + 1): data[column.name] ?? 0) * 1000) / 1000) }}
+                                        </template>
+                                        <template v-else>
+                                            {{ column.subFunc? column.subFunc(data, item, index + 1): data[column.name] ?? '-'}}
+                                        </template>
+                                    </td>
+                                </template>
+                            </tr>
+                        </template>
+                    </template>
                 </tbody>
             </table>
         </div>
-        <div class="w-full md:flex-row flex-col gap-y-4 flex items-center justify-between">
+        <div class="w-full flex flex-col items-center justify-between gap-y-4 md:flex-row">
             <div>
                 <p class="text-sm text-slate-600 dark:text-slate-400">Showing {{showing.start}} to {{showing.end}} of {{showing.total}} entries</p>
             </div>
             <div class="btn-group">
-                <button @click="gotoPage(1)" type="button" :disable="state.currentPage === 1? 'disabled': ''" class="first-page-button btn btn-light-dark">
+                <button @click="gotoPage(1)" type="button" :disable="state.currentPage === 1? 'disabled': ''" class="btn btn-light-dark first-page-button">
                     <i class="i-ph-caret-double-left"></i>
                 </button>
-                <button @click="gotoPage(null, -1)" :disable="state.currentPage === 1? 'disabled': ''" type="button" class="previous-page-button btn btn-light-dark">
+                <button @click="gotoPage(null, -1)" :disable="state.currentPage === 1? 'disabled': ''" type="button" class="btn btn-light-dark previous-page-button">
                     <i class="i-ph-caret-left"></i>
                 </button>
                 
                 <button v-for="page in paginations" @click="typeof page === 'number'? gotoPage(page): ''" :key="page" type="button" class="page-number" :class="state.currentPage === page? ' active': ''">{{page}}</button>
                 
-                <button @click="gotoPage(null, 1)" :class="state.currentPage === paginations.length? 'disabled': ''" type="button" class="next-page-button btn btn-light-dark">
+                <button @click="gotoPage(null, 1)" :class="state.currentPage === paginations.length? 'disabled': ''" type="button" class="btn btn-light-dark next-page-button">
                     <i class="i-ph-caret-right"></i>
                 </button>
-                <button @click="gotoPage(paginations[paginations.length - 1] as number ?? 1)" :class="state.currentPage === paginations.length? 'disabled': ''" type="button" class="last-page-button btn btn-light-dark">
+                <button @click="gotoPage(paginations[paginations.length - 1] as number ?? 1)" :class="state.currentPage === paginations.length? 'disabled': ''" type="button" class="btn btn-light-dark last-page-button">
                     <i class="i-ph-caret-double-right"></i>
                 </button>
             </div>
