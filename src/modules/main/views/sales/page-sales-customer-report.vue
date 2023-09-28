@@ -18,7 +18,7 @@ const columns = [
     // {name: 'item', label: 'Item', func: (d: any) => d.item?.code ?? '-'},
     // {name: 'description', func: (d: any) => d.item?.code ?? '-'},
     {name: 'invoiceNumber', label: 'Invoice Number'},
-    {name: 'fpNo', label: 'FP NO'},
+    {name: 'notes', label: 'FP NO'},
     {name: 'salesman', label: 'Salesman', func: (d: any) => d.createdBy?.name},
     {name: 'kdSalesman', label: 'KD Salesman', func: (d: any) => d.createdBy?.username},
     {name: 'soldTo', label: 'Sold To', func: (d: any) =>  d.customer?.code},
