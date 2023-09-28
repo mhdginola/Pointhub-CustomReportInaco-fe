@@ -13,7 +13,7 @@ const getItemRowSpan = function(item: any, index: number){
 
 const getItemTotalPerPrincipal = function(item: any, actualItem: any, index: number){
     const itemGroup = getItemGroup(actualItem, index);
-    return itemGroup.reduce((p: any, c: any) => p + ((c.price  - c.discount) * c.quantity), 0)
+    return itemGroup.reduce((p: any, c: any) => p + ((c.price  - (c.discount ?? 0)) * c.quantity), 0)
 }
 
 const columns = [
@@ -27,11 +27,11 @@ const columns = [
     {name: 'uomQty', label: 'Uom Quantity', subRow: true, subFunc: (d: any) => d.unit},
     {name: 'pricePerQty', label: 'Price', type: 'number', subRow: true, subFunc: (d: any) => d.price},
     {name: 'totalBeforeDiscount', subRow: true, subFunc: (d: any) => d.subtotal, label: 'Total Before Discount', type: 'number'},
-    {name: 'discount', label: 'Total Discount', type: 'number', subRow: true, subFunc: (d: any) => d.discount},
-    {name: 'totalAfterDiscount', subRow: true, subFunc: (d: any) => ((d.price  - d.discount) * d.quantity), label: 'Total After Discount', type: 'number'},
+    {name: 'discount', label: 'Total Discount', type: 'number', subRow: true, subFunc: (d: any) => (d.discount ?? 0)},
+    {name: 'totalAfterDiscount', subRow: true, subFunc: (d: any) => ((d.price  - (d.discount ?? 0)) * d.quantity), label: 'Total After Discount', type: 'number'},
     {name: 'totalPerPrincipal', subRow: true, subFunc: getItemTotalPerPrincipal, rowSpanFunc: (item: any, index: number) => getItemRowSpan(item, index), label: 'Total Per Principal', type: 'number'},
-    {name: 'totalBeforeDiscountByInvoice', func: (d: any) => d.items?.reduce?.((p: number, c: any) => p + (c.price - c.discount) * c.quantity, 0), label: 'Total Before Discount by Invoice', type: 'number'},
-    {name: 'totalDiscountByInvoice', func: (d: any) => d.discount, label: 'Total Before Discount by Invoice', type: 'number'},
+    {name: 'totalBeforeDiscountByInvoice', func: (d: any) => d.items?.reduce?.((p: number, c: any) => p + (c.price - (c.discount ?? 0)) * c.quantity, 0), label: 'Total Before Discount by Invoice', type: 'number'},
+    {name: 'totalDiscountByInvoice', func: (d: any) => d.discount, label: 'Total Discount by Invoice', type: 'number'},
     {name: 'taxBase', label: 'Total After Discount by Invoice', type: 'number'},
     // {name: 'totalAfterDiscount', func: (d: any) => d.items?.reduce?.((p: number, c: any) => p + c.subtotal, 0),label: 'Total After Discount', type: 'number'},
     {name: 'tax', label: 'Total Tax', type: 'number'},
