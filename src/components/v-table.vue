@@ -195,7 +195,7 @@ const rowSpan = function(column: any, data: any = null){
 <template>
     <div class="flex flex-col gap-2">
         <div class="table-container">
-            <table class="table">
+            <table id="datatable" class="table">
                 <thead>
                     <tr class="basic-table-row bg-slate-100 dark:bg-slate-700">
                         <th v-if="selectable" class="basic-table-head text-center">

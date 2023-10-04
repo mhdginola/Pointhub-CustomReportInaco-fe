@@ -2,7 +2,7 @@
 import { onMounted, reactive, ref } from 'vue';
 import { BaseInputMask, BaseModal, VTable, VTableFilters } from '@/components';
 import { client } from '@/config';
-import { Datum } from './v-table.vue';
+import ExcelJS from 'exceljs';
 
 type Column = any | {
     name: string,
@@ -60,83 +60,62 @@ const atoms = reactive({
 
 const initDownload = function(){
     atoms.isDownloadModalOpen = true;
-    setTimeout(()=>{
-        atoms.isDownloadModalOpen = false;
-    }, 3000);
-}
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(props.customRoute ?? 'Sheet 1');
 
-const compareDate = function(date1: string, date2: string){
-    let d1 = new Date(date1);
-    let d2 = new Date(date2);
+    const documentTable = document.getElementsByTagName('table')[0];
+    const rows = Array.of(...documentTable.getElementsByTagName('tr'));
 
-    return d1.getTime() >= d2.getTime();
+    rows.forEach((rowItem) => {
+        let data = Array.of(...rowItem.getElementsByTagName('td'));
+        let headers = Array.of(...rowItem.getElementsByTagName('th'));
+        let rowData = (data.length? data: headers).map(h => ({
+            value: h.innerText,
+            rowspan: parseInt(h.getAttribute('rowspan') ?? '1'),
+        }));
+
+        const row = worksheet.addRow(rowData.map(r => r.value));
+
+        row.eachCell((cell, colNumber) => {
+            if (rowData[colNumber - 1] && rowData[colNumber - 1].rowspan > 1) {
+                const rowspan = rowData[colNumber - 1].rowspan;
+                worksheet.mergeCells(row.number, colNumber, row.number + rowspan - 1, colNumber);
+            }
+            
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        });
+
+        worksheet.columns.forEach(function (column) {
+            let maxLength = 0;
+            column?.["eachCell"]?.({ includeEmpty: true }, function (cell) {
+                var columnLength = cell.value ? cell.value.toString().length * 1.6 : 10;
+                if (columnLength > maxLength ) {
+                    maxLength = columnLength;
+                }
+            });
+            column.width = maxLength < 10 ? 10 : maxLength;
+        });
+
+        workbook.xlsx.writeBuffer().then((buffer) => {
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = window.URL.createObjectURL(blob);
+
+            // Create a link element and trigger the download
+            const a = document.createElement('a');
+            a.setAttribute('id', 'download-link');
+            a.href = url;
+            a.download = props.customRoute + '.xlsx';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            atoms.isDownloadModalOpen = false;
+            a.remove();
+        });
+    });
 }
 
 const changePage = function({page: newPage}: any){
     page.value = newPage
     search();
-}
-
-const updateSearch = function(){
-    // @ts-ignore
-    state.data = props.templateData.filter((t: any) => {
-        if(state.filters){
-            // @ts-ignore Column dateFrom and dateTo
-            if(state.filters.dateFrom){
-                let date = t.dateInvoice || t.invoiceDate || t.createDate;
-                if(date){
-                    if(!compareDate(date, state.filters.dateFrom)){
-                        return false;
-                    }
-                }
-            }
-            if(state.filters.dateTo){
-                let date = t.dateInvoice || t.invoiceDate;
-                if(date){
-                    if(!compareDate(state.filters.dateTo, date)){
-                        return false;
-                    }
-                }
-            }
-            if(state.filters.item){
-                if(t.item){
-                    if(state.filters.item.id &&t.item !== state.filters.item?.id){
-                        return false;
-                    }
-                }
-            }
-            if(state.filters.customer){
-                let c = t.name || t.customer;
-                if(c){
-                    if(state.filters.customer.id &&c !== state.filters.customer?.id){
-                        return false;
-                    }
-                }
-            }
-            if(state.filters.warehouse){
-                if(t.warehouse){
-                    if(state.filters.warehouse.id && t.warehouse !== state.filters.warehouse?.id){
-                        return false;
-                    }
-                }
-            }
-            if(state.filters.supplier){
-                if(t.supplier){
-                    if(t.supplier !== state.filters.supplier){
-                        return false;
-                    }
-                }
-            }
-        }
-
-        if(state.searchTerm){
-            if(!Object.values(t).some((i) => `${i}`?.toLowerCase().includes(state.searchTerm.toLowerCase()))){
-                return false;
-            }
-        }
-        return true;
-    });
-    state.pagination.totalDocument = state.data.length;
 }
 
 const serializeFilter = function(filters: any){
@@ -166,7 +145,7 @@ const search = function(){
     }).then(function({data, pagination}: any){
         state.data = data;
         state.pagination = pagination;
-    }).catch(e => {
+    }).catch(() => {
         // updateSearch();
     });
 }
@@ -188,13 +167,32 @@ onMounted(() => {
     // state.data = props.templateData;
     search();
 });
+
+const printData = function(){
+    const divToPrint = document.getElementById("datatable");
+    const mywindow = window.open("", 'PRINT', 'height=400,width=600');
+    if(divToPrint && mywindow){
+        // mywindow.document.write('<html><head><title>' + document.title  + '</title>');
+        // mywindow.document.write('</head><body >');
+        // mywindow.document.write('<h1>' + document.title  + '</h1>');
+        // mywindow.document.write(divToPrint.innerHTML);
+        // mywindow.document.write('</body></html>');
+
+        // mywindow.document.close(); // necessary for IE >= 10
+        // mywindow.focus(); // necessary for IE >= 10*/
+
+        // mywindow.print();
+        // mywindow.close();
+        window.print();
+    }    
+}
 </script>
 <template>
     <div class="flex flex-col gap-2">
         <div class="flex flex-row justify-end">
             <div>
                 <button
-                    @click="atoms.isPrintModalOpen = true;"
+                    @click="printData"
                     class="btn-print btn-icon" :class="'print-' + customRoute">
                     <i class="i-ph-printer"></i>
                 </button>
@@ -217,7 +215,7 @@ onMounted(() => {
                             placeholder="input a search term"
                         ></component>
                     </div>
-                    <button class="fixed w-2 h-2 z-[10000] top-0 left-0 opacity-0" id="search"></button>
+                    <button class="fixed left-0 top-0 z-[10000] h-2 w-2 opacity-0" id="search"></button>
                 </div>
             </div>
         
@@ -239,7 +237,7 @@ onMounted(() => {
         >
             <template #content>
                 <div class="modal-download-progress max-h-90vh overflow-auto p-4" :class="'modal-download-' + customRoute + '-progress'">
-                    <div class="space-y-8 mx-auto text-center">
+                    <div class="mx-auto text-center space-y-8">
                         <p>
                             Downloading... please wait
                         </p>

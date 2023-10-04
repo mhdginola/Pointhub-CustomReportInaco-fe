@@ -27,6 +27,12 @@ h3 {
   @apply bg-slate-200 dark:bg-slate-700 px-1;
 }
 
+@media print {
+  .table-container {
+    overflow-x: visible;
+  }
+}
+
 /* scrollbar */
 ::-webkit-scrollbar {
   @apply w-1 h-1 rounded-lg;

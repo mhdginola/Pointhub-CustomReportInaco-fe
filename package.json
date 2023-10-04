@@ -27,6 +27,7 @@
     "axios": "^1.4.0",
     "cleave.js": "^1.6.0",
     "dayjs": "^1.11.7",
+    "exceljs": "^4.3.0",
     "highlight.js": "^11.7.0",
     "pinia": "^2.0.36",
     "query-string": "^8.1.0",
