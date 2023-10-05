@@ -85,31 +85,33 @@ const initDownload = function(){
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
         });
 
-        worksheet.columns.forEach(function (column) {
-            let maxLength = 0;
-            column?.["eachCell"]?.({ includeEmpty: true }, function (cell) {
-                var columnLength = cell.value ? cell.value.toString().length * 1.6 : 10;
-                if (columnLength > maxLength ) {
-                    maxLength = columnLength;
-                }
-            });
-            column.width = maxLength < 10 ? 10 : maxLength;
-        });
+        
+    });
 
-        workbook.xlsx.writeBuffer().then((buffer) => {
-            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            const url = window.URL.createObjectURL(blob);
-
-            // Create a link element and trigger the download
-            const a = document.createElement('a');
-            a.setAttribute('id', 'download-link');
-            a.href = url;
-            a.download = props.customRoute + '.xlsx';
-            a.click();
-            window.URL.revokeObjectURL(url);
-            atoms.isDownloadModalOpen = false;
-            a.remove();
+    worksheet.columns.forEach(function (column) {
+        let maxLength = 0;
+        column?.["eachCell"]?.({ includeEmpty: true }, function (cell) {
+            var columnLength = cell.value ? cell.value.toString().length * 1.6 : 10;
+            if (columnLength > maxLength ) {
+                maxLength = columnLength;
+            }
         });
+        column.width = maxLength < 10 ? 10 : maxLength;
+    });
+
+    workbook.xlsx.writeBuffer().then((buffer) => {
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+
+        // Create a link element and trigger the download
+        const a = document.createElement('a');
+        a.setAttribute('id', 'download-link');
+        a.href = url;
+        a.download = props.customRoute + '.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(url);
+        atoms.isDownloadModalOpen = false;
+        a.remove();
     });
 }
 
