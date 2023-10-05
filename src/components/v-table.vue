@@ -215,13 +215,12 @@ const rowSpan = function(column: any, data: any = null){
                     <template v-for="(item, index) in slicedData" :key="item.id ?? index">
                         <tr class="basic-table-row">
                             <td v-if="selectable" :rowSpan="rowSpan('default', item)" class="basic-table-head text-center">
-                            <BaseCheckbox theme="info" :model-value="state.selectedRows.includes(item.id)" @update:model-value="selectRow(item.id)" />
-                        </td>
-                        <td v-if="rowNumber" :rowSpan="rowSpan('index', item)" class="no basic-table-body">
-                            {{ (index + 1) + ((state.currentPage - 1) * props.perPage) }}
-                        </td>
+                                <BaseCheckbox theme="info" :model-value="state.selectedRows.includes(item.id)" @update:model-value="selectRow(item.id)" />
+                            </td>
+                            <td v-if="rowNumber" :rowSpan="rowSpan('index', item)" class="no basic-table-body">
+                                {{ (index + 1) + ((state.currentPage - 1) * props.perPage) }}
+                            </td>
                         <template v-for="column in columns" :key="column.name">
-                            <td v-if="!column.hide" :rowSpan="rowSpan(column, item)" :class="'hidden ' + column.name">{{ item[column.name] ?? '-' }}</td>
                             <td v-if="!column.hide && !column.subRow" :rowSpan="rowSpan(column, item)" class="basic-table-body">        
                                 <template v-if="column.type === 'number'">
                                     {{ Intl.NumberFormat('en-US', {
@@ -246,6 +245,12 @@ const rowSpan = function(column: any, data: any = null){
                         </tr>
                         <template v-if="props.subRowKey">
                             <tr class="basic-table-row" v-for="(data, index) in item[props.subRowKey]?.slice(1)" :key="index">
+                                <td v-if="selectable" class="basic-table-head hidden text-center">
+                                    <BaseCheckbox theme="info" :model-value="state.selectedRows.includes(item.id)" @update:model-value="selectRow(item.id)" />
+                                </td>
+                                <td v-if="rowNumber" class="basic-table-body hidden">
+                                    {{ (index + 1) + ((state.currentPage - 1) * props.perPage) }}
+                                </td>
                                 <template v-for="column in columns" :key="column.name">
                                     <td v-if="!column.hide && column.subRow && ((column.rowSpanFunc?.(item, index + 1) ?? 1) !== 0)" :rowSpan="column.rowSpanFunc?.(item, index + 1) ?? 1" :class="'basic-table-body '">        
                                         <template v-if="column.type === 'number'">
@@ -257,6 +262,7 @@ const rowSpan = function(column: any, data: any = null){
                                             {{ column.subFunc? column.subFunc(data, item, index + 1): data[column.name] ?? '-'}}
                                         </template>
                                     </td>
+                                    <td v-else class="hidden"></td>
                                 </template>
                             </tr>
                         </template>
@@ -265,7 +271,7 @@ const rowSpan = function(column: any, data: any = null){
             </table>
         </div>
         <div class="w-full flex flex-col items-center justify-between gap-y-4 md:flex-row">
-            <div>
+            <div id="table_showing">
                 <p class="text-sm text-slate-600 dark:text-slate-400">Showing {{showing.start}} to {{showing.end}} of {{showing.total}} entries</p>
             </div>
             <div class="btn-group">

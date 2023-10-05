@@ -74,18 +74,34 @@ const initDownload = function(){
             rowspan: parseInt(h.getAttribute('rowspan') ?? '1'),
         }));
 
-        const row = worksheet.addRow(rowData.map(r => r.value));
+        worksheet.addRow(rowData.map(r => r.value));
+    });
+
+    rows.forEach((rowItem, i: number) => {
+        let data = Array.of(...rowItem.getElementsByTagName('td'));
+        let headers = Array.of(...rowItem.getElementsByTagName('th'));
+        let rowData = (data.length? data: headers).map(h => ({
+            value: h.innerText,
+            rowspan: parseInt(h.getAttribute('rowspan') ?? '1'),
+        }));
+
+        const row = worksheet.getRow(i + 1);
+        let isHeader = data.length === 0;
 
         row.eachCell((cell, colNumber) => {
             if (rowData[colNumber - 1] && rowData[colNumber - 1].rowspan > 1) {
                 const rowspan = rowData[colNumber - 1].rowspan;
-                worksheet.mergeCells(row.number, colNumber, row.number + rowspan - 1, colNumber);
+                try {
+                    worksheet.mergeCells(row.number, colNumber, row.number + rowspan - 1, colNumber);
+                } catch (e){ /* empty */ }
+                console.log(row.number, colNumber);
             }
             
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            if(isHeader){
+                cell.font = { bold: true };
+            }
         });
-
-        
     });
 
     worksheet.columns.forEach(function (column) {
@@ -172,20 +188,24 @@ onMounted(() => {
 
 const printData = function(){
     const divToPrint = document.getElementById("datatable");
+    const lastBreadCrumbs = Array.of(...(document.getElementsByClassName('breadcrumb-item')));
+    const showingText = document.getElementById("table_showing")?.textContent ?? '';
     const mywindow = window.open("", 'PRINT', 'height=400,width=600');
     if(divToPrint && mywindow){
-        // mywindow.document.write('<html><head><title>' + document.title  + '</title>');
-        // mywindow.document.write('</head><body >');
-        // mywindow.document.write('<h1>' + document.title  + '</h1>');
-        // mywindow.document.write(divToPrint.innerHTML);
-        // mywindow.document.write('</body></html>');
+        mywindow.document.write('<html><head><title>' + document.title  + '</title>');
+        mywindow.document.write('<style>th, td {border: 1px solid black; padding-left: 8px; padding-right: 8px;} table {border-collapse: collapse;} .hidden {display: none}</style>');
+        mywindow.document.write('</head><body>');
+        mywindow.document.write('<h1>' + ((lastBreadCrumbs[lastBreadCrumbs.length - 1])?.textContent ?? '')  + '</h1>');
+        mywindow.document.write('<p>' + showingText  + '</p>');
+        mywindow.document.write(divToPrint.outerHTML);
+        mywindow.document.write('</body></html>');
 
-        // mywindow.document.close(); // necessary for IE >= 10
-        // mywindow.focus(); // necessary for IE >= 10*/
+        mywindow.document.close(); // necessary for IE >= 10
+        mywindow.focus(); // necessary for IE >= 10*/
 
-        // mywindow.print();
+        mywindow.print();
         // mywindow.close();
-        window.print();
+        // window.print();
     }    
 }
 </script>
