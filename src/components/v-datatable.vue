@@ -196,7 +196,7 @@ const printData = function(){
         mywindow.document.write('<style>th, td {border: 1px solid black; padding-left: 8px; padding-right: 8px;} table {border-collapse: collapse;} .hidden {display: none}</style>');
         mywindow.document.write('</head><body>');
         mywindow.document.write('<h1>' + ((lastBreadCrumbs[lastBreadCrumbs.length - 1])?.textContent ?? '')  + '</h1>');
-        mywindow.document.write('<p>' + showingText  + '</p>');
+        // mywindow.document.write('<p>' + showingText  + '</p>');
         mywindow.document.write(divToPrint.outerHTML);
         mywindow.document.write('</body></html>');
 
