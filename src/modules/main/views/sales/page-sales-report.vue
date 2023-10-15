@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { VDatatable } from '@/components';
-import { warehouses, items } from '@/data/index';
+import { useSingularApi } from '@/config/connection';
+import { ref, computed } from 'vue';
+
+const warehouses = ref<any>([]);
+const items = ref<any>([]);
+
+useSingularApi('/sales/warehouse', warehouses);
+useSingularApi('/sales/item?pageSize=100', items);
 
 const getItemGroup = function(item: any, index: number){
     return (item.items ?? []).filter((subData: any) => subData.group === (item.items ?? [])[index]?.group)
@@ -38,39 +45,41 @@ const columns = [
     {name: 'total', label: 'Total After Tax', type: 'number'},
 ];
 
-const filterFields = [
-    {
-        label: 'Date From',
-        name: 'dateFrom',
-        type: 'date',
-        component: 'input',
-        defaultValue: '01-05-2023',
-        options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
-        placeholder: 'YYYY-MM-DD',
-    },
-    {
-        label: 'Date To',
-        name: 'dateTo',
-        type: 'date',
-        component: 'input',
-        options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
-        placeholder: 'YYYY-MM-DD',
-    },
-    {
-        label: 'Item',
-        name: 'item',
-        component: 'select',
-        options: items,
-        placeholder: 'Choose One',
-    },
-    {
-        label: 'Warehouse',
-        name: 'warehouse',
-        component: 'select',
-        options: warehouses,
-        placeholder: 'Choose One',
-    }
-]
+const filterFields = computed(() => {
+    return [
+        {
+            label: 'Date From',
+            name: 'dateFrom',
+            type: 'date',
+            component: 'input',
+            defaultValue: '01-05-2023',
+            options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
+            placeholder: 'YYYY-MM-DD',
+        },
+        {
+            label: 'Date To',
+            name: 'dateTo',
+            type: 'date',
+            component: 'input',
+            options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
+            placeholder: 'YYYY-MM-DD',
+        },
+        {
+            label: 'Item',
+            name: 'item_id',
+            component: 'select',
+            options: items.value.map((c: any) => ({id: c._id, label: c.code? c.code + ' (' + c.name + ')': '-'})),
+            placeholder: 'Choose One',
+        },
+        {
+            label: 'Warehouse',
+            name: 'warehouse_id',
+            component: 'select',
+            options: warehouses.value.map((c: any) => ({id: c._id, label: c.code? c.code + ' (' + c.name + ')': '-'})),
+            placeholder: 'Choose One',
+        }
+    ]
+});
 
 const templateData = [
     { id: 1, productCode:'NB001', warehouse: 'warehouse_test', description:'PO-001', principle: 'PT ABC', totalInvoiced: '2023-01-01', totalBeforeDiscount: 'NSJ-001', item: 'NFP-001', totalDiscount: '1000', totalAfterDiscount: '100', totalTax: '9000', totalAfterTax: '100',discount: '100' },

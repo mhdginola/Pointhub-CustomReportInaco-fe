@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { VDatatable } from '@/components';
 import { useSingularApi } from '@/config/connection';
-import { warehouses, items } from '@/data/index';
 import { computed, ref } from 'vue';
 
 const suppliers = ref<any>([]);
+const warehouses = ref<any>([]);
+const items = ref<any>([]);
 
 useSingularApi('/supplier', suppliers);
+useSingularApi('/purchase/warehouse', warehouses);
+useSingularApi('/purchase/item?pageSize=100', items);
 
 const columns = [
     {name: 'warehouse', label: 'Warehouse', func: (d: any) => d.warehouse?.code ?? '-'},
@@ -56,16 +59,16 @@ const filterFields = computed(() => {
         },
         {
             label: 'Item',
-            name: 'item',
+            name: 'item_id',
             component: 'select',
-            options: items,
+            options: items.value.map((c: any) => ({id: c._id, label: c.code + ' (' + c.name + ')'})),
             placeholder: 'Choose One',
         },
         {
             label: 'Warehouse',
-            name: 'warehouse',
+            name: 'warehouse_id',
             component: 'select',
-            options: warehouses,
+            options: warehouses.value.map((c: any) => ({id: c._id, label: c.code? c.code + ' (' + c.name + ')': '-'})),
             placeholder: 'Choose One',
         }
     ]
