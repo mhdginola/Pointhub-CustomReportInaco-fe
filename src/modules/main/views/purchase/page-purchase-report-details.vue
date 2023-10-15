@@ -49,7 +49,7 @@ const filterFields = computed(() => {
         },
         {
             label: 'Supplier',
-            name: 'supplier',
+            name: 'supplier_id',
             component: 'select',
             options: suppliers.value.map((c: any) => ({id: c._id, label: c.code + ' (' + c.name + ')'})),
             placeholder: 'Choose One',
