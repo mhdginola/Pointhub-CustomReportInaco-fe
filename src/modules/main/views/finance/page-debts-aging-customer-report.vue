@@ -15,7 +15,7 @@ const columns = [
     // {name: 'name', label: 'Name', func: (d: any) => d.item?.name || '-'},
     // {name: 'subTotalPerPrinciple', label: 'Sub Total Per Principle', func: (d: any) => d.price || 0, type: 'number'},
     {name: 'notes', label: 'Description'},
-    {name: 'dpp', label: 'DPP', func: (d: any) => d.price && d.quantity? d.price * d.quantity: 0, type: 'number'},
+    {name: 'dpp', label: 'DPP', func: (d: any) => d.price && d.quantity? d.price * d.quantity: d.taxBase, type: 'number'},
     {name: 'tax', label: 'PPN', type: 'number'},
     // {name: 'quantity', label: 'Quantity', type: 'number'},
     {name: 'total', label: 'Total Invoice', type: 'number'},

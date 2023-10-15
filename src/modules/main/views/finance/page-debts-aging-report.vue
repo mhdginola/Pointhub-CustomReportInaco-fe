@@ -7,16 +7,30 @@ const customers = ref<any>([]);
 
 useSingularApi('/customer', customers);
 
+const getItemGroup = function(item: any, index: number){
+    return (item.items ?? []).filter((subData: any) => subData.group === (item.items ?? [])[index]?.group)
+}
+const getItemRowSpan = function(item: any, index: number){
+    let actualIndex = (item.items ?? []).findIndex((f: any) => f?.group === (item.items)[index]?.group);
+    const totalIndices = getItemGroup(item, index)?.length;
+    return actualIndex === index? totalIndices: 0;
+}
+
+const getItemTotalPerPrincipal = function(item: any, actualItem: any, index: number){
+    const itemGroup = getItemGroup(actualItem, index);
+    return itemGroup.reduce((p: any, c: any) => p + ((c.price  - (c.discount ?? 0)) * c.quantity), 0)
+}
+
 const columns = [
-    {name: 'productCode', label: 'Product Code', func: (d: any) => d.item?.code || '-'},
-    {name: 'name', label: 'Name', func: (d: any) => d.item?.name || '-'},
-    {name: 'subTotalPerPrinciple', label: 'Sub Total Per Principle', func: (d: any) => d.price || 0, type: 'number'},
+    {name: 'productCode', label: 'Product Code', subRow: true, subFunc: (d: any) => d.group, rowSpanFunc: (item: any, index: number) => getItemRowSpan(item, index)},
+    {name: 'item', subRow: true, subFunc: (d: any) => d.code, label: 'Name', rowSpanFunc: () => 1},
+    {name: 'quantity', subRow: true, subFunc: (d: any) => d.quantity, label: 'Quantity', rowSpanFunc: () => 1},
+    {name: 'totalPerPrincipal', subRow: true, subFunc: getItemTotalPerPrincipal, rowSpanFunc: (item: any, index: number) => getItemRowSpan(item, index), label: 'Sub Total Per Principal', type: 'number'},
     {name: 'invoiceNumber', label: 'Invoice'},
     {name: 'date', label: 'Invoice Date'},
     {name: 'notes', label: 'Description'},
-    {name: 'dpp', label: 'DPP', func: (d: any) => d.price && d.quantity? d.price * d.quantity: 0, type: 'number'},
+    {name: 'dpp', label: 'DPP', func: (d: any) => d.price && d.quantity? d.price * d.quantity: d.taxBase, type: 'number'},
     {name: 'tax', label: 'PPN', type: 'number'},
-    {name: 'quantity', label: 'Quantity', type: 'number'},
     {name: 'total', label: 'Total Invoice', type: 'number'},
     {name: 'payment', label: 'Payment', func: (d: any) => d.payment?.paid ?? 0, type: 'number'},
     // {name: 'debitMemo', label: 'Debit Memo'},
@@ -61,9 +75,11 @@ const templateData =  [
 </script>
 <template>
     <VDatatable 
+        :defaultRowSpanFunc="(data: any) => data?.items?.length ?? 1"
         :filters="filterFields"
         :columns="columns"
         url="receivables"
+        sub-row-key="items"
         :template-data="templateData"
         custom-route="debts-aging-reports"
     />
