@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
-import {BaseInputMask, BaseDatepicker, BaseAutocomplete} from './';
+import { computed } from 'vue';
+import { BaseInputMask, BaseDatepicker, BaseAutocomplete } from './';
 
 const props = defineProps({
     fields: Array<any>,
@@ -43,7 +43,7 @@ const bindField = function(field: any){
 <template>
     <div class="card card-template">
         <h3>Filters</h3>
-        <div class="flex flex-col md:flex-row gap-4 md:items-end">
+        <div class="flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end">
             <component v-model="computedStates[field.name]"
                 v-for="field in fields"
                 :key="field.name"
@@ -53,7 +53,7 @@ const bindField = function(field: any){
                 :label="field.label"
                 v-bind="bindField(field)"
             />
-            <button class="btn-sm btn-primary w-fit" id="filter" @click="$emit('submit')">Apply</button>
+            <button class="btn-primary btn-sm w-fit" id="filter" @click="$emit('submit')">Apply</button>
         </div>
     </div>
 </template>

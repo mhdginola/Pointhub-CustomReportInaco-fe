@@ -23,7 +23,7 @@ const filterFields = [
         component: 'input',
         options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
         placeholder: 'YYYY-MM-DD',
-        defaultValue: '2023-05-01',
+        defaultValue: '01-05-2023',
     },
     {
         label: 'Date To',

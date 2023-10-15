@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { VDatatable } from '@/components';
-import { customers } from '@/data/index';
+import { useSingularApi } from '@/config/connection';
+import { computed, ref } from 'vue';
+// import { customers } from '@/data/index';
+
+const customers = ref<any>([]);
+
+useSingularApi('/customer', customers);
 
 const columns = [
     // {name: 'invoice', label: 'Invoice'},
@@ -31,32 +37,34 @@ const columns = [
     {name: 'total', label: 'Total After Tax', type: 'number', func: (d: any) => d.total? d.total: 0},
 ];
 
-const filterFields = [
-    {
-        label: 'Date From',
-        name: 'dateFrom',
-        type: 'date',
-        component: 'input',
-        options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
-        placeholder: 'YYYY-MM-DD',
-        defaultValue: '2023-05-01',
-    },
-    {
-        label: 'Date To',
-        name: 'dateTo',
-        type: 'date',
-        component: 'input',
-        options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
-        placeholder: 'YYYY-MM-DD',
-    },
-    {
-        label: 'Customer',
-        name: 'customer_id',
-        component: 'select',
-        options: customers,
-        placeholder: 'Choose One',
-    }
-]
+const filterFields = computed(() => {
+    return [
+        {
+            label: 'Date From',
+            name: 'dateFrom',
+            type: 'date',
+            component: 'input',
+            options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
+            placeholder: 'YYYY-MM-DD',
+            defaultValue: '01-05-2023',
+        },
+        {
+            label: 'Date To',
+            name: 'dateTo',
+            type: 'date',
+            component: 'input',
+            options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
+            placeholder: 'YYYY-MM-DD',
+        },
+        {
+            label: 'Customer',
+            name: 'customer_id',
+            component: 'select',
+            options: customers.value.map((c: any) => ({id: c._id, label: c.code + ' (' + c.name + ')'})),
+            placeholder: 'Choose One',
+        }
+    ]
+});
 
 const customer = 'PT ABC'
 const templateData = [

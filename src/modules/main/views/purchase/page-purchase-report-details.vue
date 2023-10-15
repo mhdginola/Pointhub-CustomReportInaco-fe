@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { VDatatable } from '@/components';
-import { suppliers, warehouses, items } from '@/data/index';
+import { useSingularApi } from '@/config/connection';
+import { warehouses, items } from '@/data/index';
+import { computed, ref } from 'vue';
+
+const suppliers = ref<any>([]);
+
+useSingularApi('/supplier', suppliers);
 
 const columns = [
     {name: 'warehouse', label: 'Warehouse', func: (d: any) => d.warehouse?.code ?? '-'},
@@ -22,46 +28,48 @@ const columns = [
     {name: 'total', label: 'Total', type: 'number', func:(d: any) =>  d.total? Math.round(parseFloat(d.total) * 1000) / 1000: 0},
 ];
 
-const filterFields = [
-    {
-        label: 'Date From',
-        name: 'dateFrom',
-        type: 'date',
-        component: 'input',
-        options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
-        placeholder: 'YYYY-MM-DD',
-        defaultValue: '2023-05-01',
-    },
-    {
-        label: 'Date To',
-        name: 'dateTo',
-        type: 'date',
-        component: 'input',
-        options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
-        placeholder: 'YYYY-MM-DD',
-    },
-    {
-        label: 'Supplier',
-        name: 'supplier',
-        component: 'select',
-        options: suppliers,
-        placeholder: 'Choose One',
-    },
-    {
-        label: 'Item',
-        name: 'item',
-        component: 'select',
-        options: items,
-        placeholder: 'Choose One',
-    },
-    {
-        label: 'Warehouse',
-        name: 'warehouse',
-        component: 'select',
-        options: warehouses,
-        placeholder: 'Choose One',
-    }
-]
+const filterFields = computed(() => {
+    return [
+        {
+            label: 'Date From',
+            name: 'dateFrom',
+            type: 'date',
+            component: 'input',
+            options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
+            placeholder: 'YYYY-MM-DD',
+            defaultValue: '01-05-2023',
+        },
+        {
+            label: 'Date To',
+            name: 'dateTo',
+            type: 'date',
+            component: 'input',
+            options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
+            placeholder: 'YYYY-MM-DD',
+        },
+        {
+            label: 'Supplier',
+            name: 'supplier',
+            component: 'select',
+            options: suppliers.value.map((c: any) => ({id: c._id, label: c.code + ' (' + c.name + ')'})),
+            placeholder: 'Choose One',
+        },
+        {
+            label: 'Item',
+            name: 'item',
+            component: 'select',
+            options: items,
+            placeholder: 'Choose One',
+        },
+        {
+            label: 'Warehouse',
+            name: 'warehouse',
+            component: 'select',
+            options: warehouses,
+            placeholder: 'Choose One',
+        }
+    ]
+})
 
 const templateData = [
     { id: 1, purchaseOrderNumber:'NB001', warehouse: 'warehouse_test', vendorNumber:'PO-001', vendorName: 'supplier1', createDate: '2023-01-01', noInvoice: 'NSJ-001', item: 'NFP-001', itemDescription: '1000', qtyVoucher: '100', materialPrice: '9000', materialPriceConversion: '100',discount: '100', afterDiscount: '100', ppn: '100', total: '100', },

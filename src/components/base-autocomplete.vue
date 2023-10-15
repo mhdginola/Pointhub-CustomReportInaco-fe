@@ -63,7 +63,7 @@ let filtered = computed(() =>
     <div class="relative mt-1">
       <label
         v-if="props.label"
-        class="font-bold text-sm"
+        class="text-sm font-bold"
       >
       {{ props.label }}
     </label>

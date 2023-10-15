@@ -159,7 +159,8 @@ const search = function(){
         // filter: serializeFilter(state.filters),
         ...serializeFilter(state.filters),
         page: page.value,
-        search: state.searchTerm
+        supplier: state.searchTerm,
+        customer: state.searchTerm
     }).then(function({data, pagination}: any){
         state.data = data;
         state.pagination = pagination;
@@ -189,7 +190,7 @@ onMounted(() => {
 const printData = function(){
     const divToPrint = document.getElementById("datatable");
     const lastBreadCrumbs = Array.of(...(document.getElementsByClassName('breadcrumb-item')));
-    const showingText = document.getElementById("table_showing")?.textContent ?? '';
+    // const showingText = document.getElementById("table_showing")?.textContent ?? '';
     const mywindow = window.open("", 'PRINT', 'height=400,width=600');
     if(divToPrint && mywindow){
         mywindow.document.write('<html><head><title>' + document.title  + '</title>');

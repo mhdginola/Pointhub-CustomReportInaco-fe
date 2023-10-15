@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Ref, ref } from 'vue';
 
 export const client = function(){
     return axios.create({
@@ -25,6 +26,28 @@ client.search = function(url: string, params: Object = {}){
             reject(e);
         });
     });
+}
+
+export const useFetchApi = function(url: string){
+    const response = ref<any>({});
+    const isLoading = ref(false);
+    const request = async () => {
+        isLoading.value = true;
+        try {
+            const res = await client().get(url);
+            isLoading.value = false;
+            response.value = res.data?.data;
+        } catch (e) {
+            isLoading.value = false;
+        }
+    };
+    return { request, response, isLoading };
+}
+
+export const useSingularApi = async function(url: string, bindRef: Ref){
+    const { request, response } = useFetchApi(url);
+    await request();
+    bindRef.value = response.value;
 }
 
 export const serializeObject = function (obj: any, prefix:string = ''): string{

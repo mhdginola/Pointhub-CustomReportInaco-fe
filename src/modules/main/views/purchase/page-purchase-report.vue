@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { VDatatable } from '@/components';
-import { suppliers } from '@/data/index';
+import { useSingularApi } from '@/config/connection';
+import { computed, ref } from 'vue';
+// import { suppliers } from '@/data/index';
+
+const suppliers = ref<any>([]);
+useSingularApi('/supplier', suppliers);
 
 const columns = [
     {name: 'invoiceNumber', label: 'No. Bukti'},
@@ -15,32 +20,34 @@ const columns = [
     {name: 'total', label: 'Total', type: 'number', func: (d: any) => Math.round(parseFloat(d.total) * 1000) / 1000},
 ]
 
-const filterFields = [
-    {
-        label: 'Date From',
-        name: 'dateFrom',
-        type: 'date',
-        component: 'input',
-        options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
-        placeholder: 'YYYY-MM-DD',
-        defaultValue: '2023-05-01',
-    },
-    {
-        label: 'Date To',
-        name: 'dateTo',
-        type: 'date',
-        component: 'input',
-        options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
-        placeholder: 'YYYY-MM-DD',
-    },
-    {
-        label: 'Supplier',
-        name: 'supplier',
-        component: 'select',
-        options: suppliers,
-        placeholder: 'Choose One',
-    }
-]
+const filterFields = computed(() => {
+    return [
+        {
+            label: 'Date From',
+            name: 'dateFrom',
+            type: 'date',
+            component: 'input',
+            options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
+            placeholder: 'YYYY-MM-DD',
+            defaultValue: '01-05-2023',
+        },
+        {
+            label: 'Date To',
+            name: 'dateTo',
+            type: 'date',
+            component: 'input',
+            options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
+            placeholder: 'YYYY-MM-DD',
+        },
+        {
+            label: 'Supplier',
+            name: 'supplier_id',
+            component: 'select',
+            options: suppliers.value.map((c: any) => ({id: c._id, label: c.code + ' (' + c.name?.trim() + ')'})),
+            placeholder: 'Choose One',
+        }
+    ]
+});
 
 const templateData = [
     { id: 1, noBukti:'NB001', dateInvoice: '2023-01-01', purchaseInvoice:'PO-001', supplier: 'supplier1', noFaktur: 'NF-001', noSuratJalan: 'NSJ-001', noFakturPajak: 'NFP-001', dpp: '1000', ppn: '100', total: '900' },
