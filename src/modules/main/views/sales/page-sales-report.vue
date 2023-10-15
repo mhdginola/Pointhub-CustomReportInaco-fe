@@ -68,14 +68,14 @@ const filterFields = computed(() => {
             label: 'Item',
             name: 'item_id',
             component: 'select',
-            options: items.value.map((c: any) => ({id: c._id, label: c.code? c.code + ' (' + c.name + ')': '-'})),
+            options: items.value.map((c: any) => ({id: c._id, label: c.code? c.code + ' (' + c.name?.trim() + ')': '-'})),
             placeholder: 'Choose One',
         },
         {
             label: 'Warehouse',
             name: 'warehouse_id',
             component: 'select',
-            options: warehouses.value.map((c: any) => ({id: c._id, label: c.code? c.code + ' (' + c.name + ')': '-'})),
+            options: warehouses.value.map((c: any) => ({id: c._id, label: c.code? c.code + ' (' + c.name?.trim() + ')': '-'})),
             placeholder: 'Choose One',
         }
     ]

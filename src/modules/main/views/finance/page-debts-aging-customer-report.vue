@@ -50,7 +50,7 @@ const filterFields = computed(() => {
             label: 'Customer',
             name: 'customer_id',
             component: 'select',
-            options: customers.value.map((c: any) => ({id: c._id, label: c.code + ' (' + c.name + ')'})),
+            options: customers.value.map((c: any) => ({id: c._id, label: c.code + ' (' + c.name?.trim() + ')'})),
             placeholder: 'Choose One',
         },
     ]
