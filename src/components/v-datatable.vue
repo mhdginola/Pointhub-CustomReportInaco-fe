@@ -160,7 +160,8 @@ const search = function(){
         ...serializeFilter(state.filters),
         page: page.value,
         supplier: state.searchTerm,
-        customer: state.searchTerm
+        customer: state.searchTerm,
+        search: state.searchTerm
     }).then(function({data, pagination}: any){
         state.data = data;
         state.pagination = pagination;
