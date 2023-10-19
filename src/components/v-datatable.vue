@@ -58,49 +58,86 @@ const atoms = reactive({
     isDownloadModalOpen: false,
 });
 
-const initDownload = function(){
+const initDownload = async function(){
     atoms.isDownloadModalOpen = true;
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet(props.customRoute ?? 'Sheet 1');
 
-    const documentTable = document.getElementsByTagName('table')[0];
-    const rows = Array.of(...documentTable.getElementsByTagName('tr'));
+    const documents = await searchAllPages();
+    const columns = props.columns;
+    const subRowKey = props.subRowKey;
+    const defaultRowSpanFunc = (data: any) => props.defaultRowSpanFunc?.(data) ?? 1;
+    
+    const normalizedData = [];
+    for(let doc of documents){
+        let rawData = [];
+        for(let col of columns){
+            if(col.subRow){
+                // rawData.push({
+                //     value: col.func(doc),
+                //     rowSpan: defaultRowSpanFunc(doc),
+                // })
+                rawData.push({
+                    value: col.subFunc?.(doc[subRowKey]?.[0], doc, 0),
+                    rowSpan: col.rowSpanFunc?.(doc, 0) ?? 1,
+                    label: col.label,
+                });
+            } else {
+                rawData.push({
+                    value: col.func? (col.func(doc) ?? '-'): (doc[col.name] ?? '-'),
+                    rowSpan: defaultRowSpanFunc(doc),
+                    label: col.label,
+                })
+            }
+        }
+        normalizedData.push(rawData);
+        
+        for(let i = 1; i < doc[subRowKey]?.length ?? 0; i++){
+            let item = doc[subRowKey][i];
+            let delayedData = [];
+            for(let col of columns){
+                if(!col.subRow){
+                    delayedData.push({
+                        value: '',
+                        rowSpan: 0,
+                        label: col.label
+                    });
+                } else {
+                    const span = col.rowSpanFunc?.(doc, i) ?? 1
+                    const cell = col.subFunc(item, doc, i)
+                    delayedData.push({
+                        value: cell,
+                        rowSpan: span,
+                        label: col.label
+                    })
+                }
+            }
+            normalizedData.push(delayedData);
+        }
+    }
 
-    rows.forEach((rowItem) => {
-        let data = Array.of(...rowItem.getElementsByTagName('td'));
-        let headers = Array.of(...rowItem.getElementsByTagName('th'));
-        let rowData = (data.length? data: headers).map(h => ({
-            value: h.innerText,
-            rowspan: parseInt(h.getAttribute('rowspan') ?? '1'),
-        }));
-
+    worksheet.addRow(columns.map(c => c.label));
+    normalizedData.forEach((rowData) => {
         worksheet.addRow(rowData.map(r => r.value));
     });
+    
+    worksheet.getRow(1).eachCell((cell) => {
+       cell.font = { bold: true } 
+       cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    });
 
-    rows.forEach((rowItem, i: number) => {
-        let data = Array.of(...rowItem.getElementsByTagName('td'));
-        let headers = Array.of(...rowItem.getElementsByTagName('th'));
-        let rowData = (data.length? data: headers).map(h => ({
-            value: h.innerText,
-            rowspan: parseInt(h.getAttribute('rowspan') ?? '1'),
-        }));
-
-        const row = worksheet.getRow(i + 1);
-        let isHeader = data.length === 0;
+    normalizedData.forEach((rowData, i: number) => {
+        const row = worksheet.getRow(i + 2);
 
         row.eachCell((cell, colNumber) => {
-            if (rowData[colNumber - 1] && rowData[colNumber - 1].rowspan > 1) {
-                const rowspan = rowData[colNumber - 1].rowspan;
+            if (rowData[colNumber - 1] && rowData[colNumber - 1].rowSpan > 1) {
+                const rowspan = rowData[colNumber - 1].rowSpan;
                 try {
                     worksheet.mergeCells(row.number, colNumber, row.number + rowspan - 1, colNumber);
                 } catch (e){ /* empty */ }
-                console.log(row.number, colNumber);
             }
             
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
-            if(isHeader){
-                cell.font = { bold: true };
-            }
         });
     });
 
@@ -168,6 +205,16 @@ const search = function(){
     }).catch(() => {
         // updateSearch();
     });
+}
+
+const searchAllPages = async function(){
+    return (await client.search(props.url, {
+        ...serializeFilter(state.filters),
+        supplier: state.searchTerm,
+        customer: state.searchTerm,
+        search: state.searchTerm,
+        pageSize: state.pagination.totalDocument,
+    }) as any).data;
 }
 
 const updateSearchTerm = function(event: any){
