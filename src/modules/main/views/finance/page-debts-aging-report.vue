@@ -33,7 +33,7 @@ const columns = [
     {name: 'tax', label: 'PPN', type: 'number'},
     {name: 'total', label: 'Total Invoice', type: 'number'},
     {name: 'payment', label: 'Payment', func: (d: any) => d.payment?.paid ?? 0, type: 'number'},
-    // {name: 'debitMemo', label: 'Debit Memo'},
+    {name: 'debitMemo', label: 'Debit Memo', func: (d :any) => d.payment?.number},
     // {name: 'cn', label: 'CN'},
     {name: 'remaining', label: 'Remaining', type: 'number'},
 ];

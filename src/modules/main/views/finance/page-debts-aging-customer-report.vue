@@ -20,6 +20,7 @@ const columns = [
     // {name: 'quantity', label: 'Quantity', type: 'number'},
     {name: 'total', label: 'Total Invoice', type: 'number'},
     {name: 'payment', label: 'Payment', func: (d: any) => d.payment?.paid ?? 0, type: 'number'},
+    {name: 'debitMemo', label: 'Debit Memo', func: (d :any) => d.payment?.number},
     {name: 'remaining', label: 'Remaining', type: 'number'},
     // {name: 'customerID', label: 'Cust ID'},
     // {name: 'name', label: 'Name'},
@@ -30,7 +31,6 @@ const columns = [
     // {name: 'ppn', label: 'PPN'},
     // {name: 'totalInvoice', label: 'Total Invoice'},
     // {name: 'payment', label: 'Payment'},
-    // {name: 'debitMemo', label: 'Debit Memo'},
     // {name: 'cn', label: 'CN'},
     // {name: 'remaining', label: 'Remaining', type: 'number'},
 ];
