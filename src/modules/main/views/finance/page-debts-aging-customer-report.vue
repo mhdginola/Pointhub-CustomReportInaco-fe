@@ -9,6 +9,7 @@ useSingularApi('/customer', customers);
 const columns = [
     {name: 'customerID', label: 'Cust ID', func: (d: any) => d.customer?.code || '-'},
     {name: 'name', label: 'Name', func: (d: any) => d.customer?.name || '-'},
+    {name: 'warehouse', label: 'Warehouse', func: (d: any) => d.warehouse.name},
     {name: 'invoiceNumber', label: 'Invoice'},
     {name: 'date', label: 'Invoice Date'},
     // {name: 'productCode', label: 'Product Code', func: (d: any) => d.item?.code || '-'},

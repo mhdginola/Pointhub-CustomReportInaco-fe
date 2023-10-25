@@ -22,6 +22,9 @@ const getItemTotalPerPrincipal = function(item: any, actualItem: any, index: num
 }
 
 const columns = [
+    {name: 'customerID', label: 'Cust ID', func: (d: any) => d.customer?.code || '-'},
+    {name: 'name', label: 'Cust Name', func: (d: any) => d.customer?.name || '-'},
+    {name: 'warehouse', label: 'Warehouse', func: (d: any) => d.warehouse.name},
     {name: 'productCode', label: 'Product Code', subRow: true, subFunc: (d: any) => d.group, rowSpanFunc: (item: any, index: number) => getItemRowSpan(item, index)},
     {name: 'item', subRow: true, subFunc: (d: any) => d.code, label: 'Name', rowSpanFunc: () => 1},
     {name: 'quantity', subRow: true, subFunc: (d: any) => d.quantity, label: 'Quantity', rowSpanFunc: () => 1},
