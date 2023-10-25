@@ -3,7 +3,7 @@
 }
 
 html.dark {
-  @apply [color-scheme:dark];
+  @apply [color-scheme:light];
 }
 
 body {
@@ -25,6 +25,12 @@ h3 {
 
 .highlight {
   @apply bg-slate-200 dark:bg-slate-700 px-1;
+}
+
+@media print {
+  .table-container {
+    overflow-x: visible;
+  }
 }
 
 /* scrollbar */

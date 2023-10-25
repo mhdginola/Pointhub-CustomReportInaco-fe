@@ -5,6 +5,7 @@ interface Props {
   label?: string
   description?: string
   placeholder?: string
+  name?: string
   type?: 'text' | 'tel' | 'email' | 'password' | 'date' | 'number'
   border?: 'simple' | 'full' | 'none'
   layout?: 'vertical' | 'horizontal'
@@ -39,6 +40,12 @@ const value = computed({
   },
   get: () => props.modelValue
 })
+
+const takeInput = function(e: any){
+  if(!e.target.value){
+    emit('update:modelValue', '')
+  }
+}
 </script>
 
 <template>
@@ -78,6 +85,8 @@ const value = computed({
         :required="props.required"
         :readonly="props.readonly"
         :disabled="props.disabled"
+        :name="props.name"
+        @change="takeInput"
       />
       <slot name="helper" v-if="helper">
         <span class="text-sm font-light text-slate-500">{{ helper }}</span>

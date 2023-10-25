@@ -1,0 +1,66 @@
+<script setup lang="ts">
+import { VDatatable } from '@/components';
+import { useSingularApi } from '@/config/connection';
+import { computed, ref } from 'vue';
+// import { suppliers } from '@/data/index';
+
+const suppliers = ref<any>([]);
+useSingularApi('/supplier', suppliers);
+
+const columns = [
+    {name: 'invoiceNumber', label: 'No. Bukti'},
+    {name: 'date', label: 'Date Invoice'},
+    // {name: 'invoiceNumber', label: 'Purchase Invoice'},
+    {name: 'supplier', label: 'Supplier', func: (d: any)=>d.supplier?.name},
+    // {name: 'invoiceNumber', label: 'No. Faktur'},
+    {name: 'noSuratJalan', label: 'No. Surat Jalan', func: (d: any) => d.purchaseReceive?.number ?? '-'},
+    {name: 'fakturPajak', label: 'No. Faktur Pajak', func: (d: any) => d.notes ?? '-'},
+    {name: 'taxBase', label: 'DPP', type: 'number', func: (d: any) => Math.round(parseFloat(d.taxBase) * 1000) / 1000},
+    {name: 'tax', label: 'PPN', type: 'number', func: (d: any) => Math.round(parseFloat(d.tax) * 1000) / 1000},
+    {name: 'total', label: 'Total', type: 'number', func: (d: any) => Math.round(parseFloat(d.total) * 1000) / 1000},
+]
+
+const filterFields = computed(() => {
+    return [
+        {
+            label: 'Date From',
+            name: 'dateFrom',
+            type: 'date',
+            component: 'input',
+            options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
+            placeholder: 'YYYY-MM-DD',
+            defaultValue: '01-05-2023',
+        },
+        {
+            label: 'Date To',
+            name: 'dateTo',
+            type: 'date',
+            component: 'input',
+            options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
+            placeholder: 'YYYY-MM-DD',
+        },
+        {
+            label: 'Supplier',
+            name: 'supplier_id',
+            component: 'select',
+            options: suppliers.value.map((c: any) => ({id: c._id, label: c.code + ' (' + c.name?.trim() + ')'})),
+            placeholder: 'Choose One',
+        }
+    ]
+});
+
+const templateData = [
+    { id: 1, noBukti:'NB001', dateInvoice: '2023-01-01', purchaseInvoice:'PO-001', supplier: 'supplier1', noFaktur: 'NF-001', noSuratJalan: 'NSJ-001', noFakturPajak: 'NFP-001', dpp: '1000', ppn: '100', total: '900' },
+    { id: 2, noBukti:'NB002', dateInvoice: '2022-01-01', purchaseInvoice:'PO-002', supplier: 'supplier2', noFaktur: 'NF-002', noSuratJalan: 'NSJ-002', noFakturPajak: 'NFP-002', dpp: '2000', ppn: '100', total: '1900' },
+    { id: 3, noBukti:'NB003', dateInvoice: '2022-06-01', purchaseInvoice:'PO-003', supplier: 'supplier3', noFaktur: 'NF-003', noSuratJalan: 'NSJ-003', noFakturPajak: 'NFP-003', dpp: '3000', ppn: '100', total: '2900' },
+];
+</script>
+<template>
+    <VDatatable 
+        :filters="filterFields"
+        :columns="columns"
+        url="purchase-recap-report"
+        custom-route="purchase-report"
+        :template-data="templateData"
+    />
+</template>

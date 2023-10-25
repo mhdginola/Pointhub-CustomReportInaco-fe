@@ -13,6 +13,7 @@ interface Props {
   disabled?: boolean
   helper?: string
   error?: string
+  name ?: string
 }
 </script>
 
@@ -23,6 +24,7 @@ import { ref, watch, computed } from 'vue'
 const props = withDefaults(defineProps<Props>(), {
   border: 'simple',
   layout: 'vertical',
+  name: '',
   type: 'text',
   required: false,
   readonly: false,
@@ -87,6 +89,7 @@ watch(nativeDate, (newValue) => {
           <i class="i-far-calendar block"></i>
         </button>
         <input
+          :name="props.name" 
           v-model.lazy="value"
           v-cleave="{ date: true, delimiter: '-', datePattern: ['d', 'm', 'Y'] }"
           type="text"

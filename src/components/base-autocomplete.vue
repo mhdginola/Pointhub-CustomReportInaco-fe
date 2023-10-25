@@ -11,6 +11,8 @@ export interface Props {
   list: OptionsInterface[]
   helper?: string
   errors?: string[]
+  name?: string
+  label?: string
 }
 </script>
 
@@ -27,7 +29,8 @@ import {
 
 const props = withDefaults(defineProps<Props>(), {
   border: 'simple',
-  placeholder: 'Choose one'
+  placeholder: 'Choose one',
+  name: '',
 })
 
 const emit = defineEmits<{
@@ -38,7 +41,7 @@ const selected = computed({
   set: (obj: any) => {
     emit('update:modelValue', obj)
   },
-  get: () => props.modelValue
+  get: () => typeof props.modelValue === 'object'? props.modelValue: {}
 })
 
 let query = ref('')
@@ -58,8 +61,15 @@ let filtered = computed(() =>
 <template>
   <Combobox v-model="selected">
     <div class="relative mt-1">
+      <label
+        v-if="props.label"
+        class="text-sm font-bold"
+      >
+      {{ props.label }}
+    </label>
       <div class="relative">
         <ComboboxInput
+          :name="props.name"
           class="form-input"
           :placeholder="placeholder"
           :class="{

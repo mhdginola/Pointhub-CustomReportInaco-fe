@@ -4,8 +4,12 @@ import { routes as mainRoutes } from '@/modules/main/routes'
 import { routes as templateRoutes } from '@/modules/template/routes'
 
 const routes = [
+  {
+    path: '/login',
+    component: () => import('../modules/main/views/page-login.vue'),
+  },
   mainRoutes,
-  templateRoutes,
+  // templateRoutes,
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
@@ -17,5 +21,18 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes
 })
+
+router.beforeEach((to, from, next) => {
+  if(to.path.startsWith('/api')){
+    window.location.href = (to.path.replace('/api/v1', '') + '.json');
+    return;
+  }
+  if(!localStorage.getItem('auth-token') && !['/login', '/register'].includes(to.path)){
+    next({
+      path: '/login'
+    })
+  }
+  next();
+});
 
 export default router

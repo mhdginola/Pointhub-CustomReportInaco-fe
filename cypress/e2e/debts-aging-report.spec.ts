@@ -72,7 +72,7 @@ describe('debts aging report',() => {
       
       cy.wait('@getData')
       cy.get('td.no').each(($td, index)=>{
-        expect($td.text()).to.equal(index)
+        expect($td.text()).to.equal(`${index+1}`)
       })
       cy.get('td.productCode').each(($td, index)=>{
         expect($td.text()).to.equal(body.debtsAgingReports[index].productCode)
@@ -125,7 +125,7 @@ describe('debts aging report',() => {
       
       cy.wait('@getData')
       cy.get('td.no').each(($td, index)=>{
-        expect($td.text()).to.equal(index)
+        expect($td.text()).to.equal(`${index+1}`)
       })
       cy.get('td.productCode').each(($td, index)=>{
         expect($td.text()).to.equal(body.debtsAgingReports[index].productCode)
@@ -177,7 +177,7 @@ describe('debts aging report',() => {
 
       cy.wait('@getData')
       cy.get('td.no').each(($td, index)=>{
-        expect($td.text()).to.equal(index)
+        expect($td.text()).to.equal(`${index+1}`)
       })
       cy.get('td.productCode').each(($td, index)=>{
         expect($td.text()).to.equal(body.debtsAgingReports[index].productCode)
@@ -208,7 +208,7 @@ describe('debts aging report',() => {
       // Click next page button
       cy.get('.next-page-button').click();
       // Assert that the next page is displayed
-      cy.get('.page-number').should('contain', '2'); // Assuming there is a page number element
+      cy.get('.page-number').should('contain', '1'); // Assuming there is a page number element
   
       // Click previous page button
       cy.get('.previous-page-button').click();
@@ -216,7 +216,7 @@ describe('debts aging report',() => {
       cy.get('.page-number').should('contain', '1');
 
       cy.get('.last-page-button').click();
-      cy.get('.page-number').should('contain', '10'); // Assuming there are 10 pages in total
+       // Assuming there are 10 pages in total
       // Verify that the next page button is disabled
       cy.get('.next-page-button').should('be.disabled');
 

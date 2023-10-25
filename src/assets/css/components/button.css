@@ -98,5 +98,5 @@
 
 /* button group */
 .btn-group {
-  @apply relative inline-flex align-middle;
+  @apply relative inline-flex align-middle overflow-auto max-w-full;
 }
