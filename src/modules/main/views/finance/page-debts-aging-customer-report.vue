@@ -21,7 +21,7 @@ const columns = [
     // {name: 'quantity', label: 'Quantity', type: 'number'},
     {name: 'total', label: 'Total Invoice', type: 'number'},
     {name: 'payment', label: 'Payment', func: (d: any) => d.payment?.paid ?? 0, type: 'number'},
-    {name: 'debitMemo', label: 'Debit Memo', func: (d :any) => d.payment?.number},
+    {name: 'debitMemo', label: 'Debit Memo', func: (d :any) => d.memoJournal?.debit},
     {name: 'creditNote', label: 'CN'},
     {name: 'remaining', label: 'Remaining', type: 'number'},
     // {name: 'customerID', label: 'Cust ID'},
