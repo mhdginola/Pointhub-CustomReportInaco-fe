@@ -243,6 +243,12 @@ const printData = function(){
     if(divToPrint && mywindow){
         mywindow.document.write('<html><head><title>' + document.title  + '</title>');
         mywindow.document.write('<style>th, td {border: 1px solid black; padding-left: 8px; padding-right: 8px;} table {border-collapse: collapse;} .hidden {display: none}</style>');
+        mywindow.document.write(`<style>
+@media print {
+    @page {
+        size: Legal landscape; /* auto is default portrait; */
+    }
+}</style>`);
         mywindow.document.write('</head><body>');
         mywindow.document.write('<h1>' + ((lastBreadCrumbs[lastBreadCrumbs.length - 1])?.textContent ?? '')  + '</h1>');
         // mywindow.document.write('<p>' + showingText  + '</p>');
