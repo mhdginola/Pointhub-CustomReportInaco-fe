@@ -22,6 +22,9 @@ const getItemTotalPerPrincipal = function(item: any, actualItem: any, index: num
 }
 
 const columns = [
+    {name: 'invoiceNumber', label: 'Invoice'},
+    {name: 'date', label: 'Invoice Date'},
+    {name: 'notes', label: 'Description'},
     {name: 'customerID', label: 'Cust ID', func: (d: any) => d.customer?.code || '-'},
     {name: 'name', label: 'Cust Name', func: (d: any) => d.customer?.name || '-'},
     {name: 'warehouse', label: 'Warehouse', func: (d: any) => d.warehouse.name},
@@ -29,9 +32,6 @@ const columns = [
     {name: 'item', subRow: true, subFunc: (d: any) => d.code, label: 'Name', rowSpanFunc: () => 1},
     {name: 'quantity', subRow: true, subFunc: (d: any) => d.quantity, label: 'Quantity', rowSpanFunc: () => 1},
     {name: 'totalPerPrincipal', subRow: true, subFunc: getItemTotalPerPrincipal, rowSpanFunc: (item: any, index: number) => getItemRowSpan(item, index), label: 'Sub Total Per Principal', type: 'number'},
-    {name: 'invoiceNumber', label: 'Invoice'},
-    {name: 'date', label: 'Invoice Date'},
-    {name: 'notes', label: 'Description'},
     {name: 'dpp', label: 'DPP', func: (d: any) => d.price && d.quantity? d.price * d.quantity: d.taxBase, type: 'number'},
     {name: 'tax', label: 'PPN', type: 'number'},
     {name: 'total', label: 'Total Invoice', type: 'number'},
