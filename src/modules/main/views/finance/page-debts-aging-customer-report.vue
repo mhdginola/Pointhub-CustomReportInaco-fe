@@ -39,13 +39,21 @@ const columns = [
 const filterFields = computed(() => {
     return [
         {
-            label: 'Date',
-            name: 'date',
+            label: 'Date From',
+            name: 'dateFrom',
             type: 'date',
             component: 'input',
             options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
             placeholder: 'YYYY-MM-DD',
             defaultValue: '01-05-2023',
+        },
+        {
+            label: 'Date To',
+            name: 'dateTo',
+            type: 'date',
+            component: 'input',
+            options: { date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] },
+            placeholder: 'YYYY-MM-DD',
         },
         {
             label: 'Customer',
